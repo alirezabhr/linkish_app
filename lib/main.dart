@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'ui/screens/email_screen.dart';
 import 'ui/screens/home_screen.dart';
 
 void main() {
@@ -16,9 +17,10 @@ class MyApp extends StatelessWidget {
         ),
         home: Directionality(
           textDirection: TextDirection.rtl,
-          child: HomePage(),
+          child: EmailScreen(),
         ),
         routes: {
+          '/email': (ctx) => EmailScreen(),
           '/home': (ctx) => HomePage(),
         },
     );
