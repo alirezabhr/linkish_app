@@ -2,56 +2,65 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class CustomVideoPlayer extends StatefulWidget {
-  final String mediaUrl;
-
-  CustomVideoPlayer(this.mediaUrl);
-
   @override
   _CustomVideoPlayerState createState() => _CustomVideoPlayerState();
 }
 
-class _CustomVideoPlayerState extends State<VideoPlayer> {
+class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
   late VideoPlayerController _controller;
-  late Future<void> _initializeVideoPlayerFuture;
 
   @override
   void initState() {
-    _initializeVideoPlayerFuture = _controller.initialize();
+    _controller = VideoPlayerController.network(
+      'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4',
+    );
+    _controller.initialize();
     super.initState();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
     super.dispose();
+    _controller.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return _controller.value.isInitialized ? AspectRatio(
-      aspectRatio: _controller.value.aspectRatio,
-      child: VideoPlayer(_controller),
-    )
-        : Container();
+    return SingleChildScrollView(
+      child: Column(
+        children: <Widget>[
+          Container(padding: const EdgeInsets.only(top: 20.0)),
+          const Text('With remote mp4'),
+          Container(
+            padding: const EdgeInsets.all(20),
+            child: _controller.value.isInitialized
+                ? AspectRatio(
+                    aspectRatio: 9 / 16,
+                    child: Stack(
+                      alignment: Alignment.bottomCenter,
+                      children: <Widget>[
+                        VideoPlayer(_controller),
+                        VideoProgressIndicator(_controller,
+                            allowScrubbing: true),
+                      ],
+                    ),
+                  )
+                : Text("HELLO"),
+          ),
+          IconButton(
+              onPressed: () {
+                setState(() {
+                  _controller.initialize();
+                });
+                if (_controller.value.isPlaying) {
+                  _controller.pause();
+                } else {
+                  _controller.play();
+                }
+              },
+              icon: _controller.value.isPlaying ? Icon(Icons.pause) : Icon(Icons.play_circle_fill))
+        ],
+      ),
+    );
   }
 }
-
-// floatingActionButton: FloatingActionButton(
-// onPressed: () {
-// // Wrap the play or pause in a call to `setState`. This ensures the
-// // correct icon is shown.
-// setState(() {
-// // If the video is playing, pause it.
-// if (_controller.value.isPlaying) {
-// _controller.pause();
-// } else {
-// // If the video is paused, play it.
-// _controller.play();
-// }
-// });
-// },
-// // Display the correct icon depending on the state of the player.
-// child: Icon(
-// _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
-// ),
-// ),
