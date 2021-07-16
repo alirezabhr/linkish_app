@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'ui/screens/email_screen.dart';
+import 'ui/screens/verification_screen.dart';
 import 'ui/screens/home_screen.dart';
 
 void main() {
@@ -21,6 +22,8 @@ class MyApp extends StatelessWidget {
         ),
         routes: {
           '/email': (ctx) => EmailScreen(),
+          '/verification': (ctx) => VerificationScreen(),
+          // '/registration': (ctx) => RegistrationScreen(),
           '/home': (ctx) => HomePage(),
         },
     );

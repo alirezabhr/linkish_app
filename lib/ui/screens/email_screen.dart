@@ -26,7 +26,7 @@ class _EmailScreenState extends State<EmailScreen> {
           children: [
             Padding(
               padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+              const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
               child: Text(
                 "Enter You Email:",
                 style: TextStyle(fontSize: 18),
@@ -35,8 +35,8 @@ class _EmailScreenState extends State<EmailScreen> {
             ),
             Padding(
               padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-              child: TextFormField(
+              const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+              child: TextField(
                 controller: _emailController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
@@ -49,8 +49,13 @@ class _EmailScreenState extends State<EmailScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed: () {
-                    WebApi().sendEmail(_emailController.text);
+                  onPressed: ()async {
+                    try {
+                      await WebApi().sendEmail(_emailController.text);
+                      Navigator.pushReplacementNamed(context, "/verification");
+                    } catch (exception) {
+                      print(exception);   // todo should add a validation, show the exception
+                    }
                   },
                   child: Text(
                     "Continue",
