@@ -52,7 +52,7 @@ class _EmailScreenState extends State<EmailScreen> {
                   onPressed: ()async {
                     try {
                       await WebApi().sendEmail(_emailController.text);
-                      Navigator.pushReplacementNamed(context, "/verification");
+                      Navigator.pushReplacementNamed(context, "/verification", arguments: _emailController.text);
                     } catch (exception) {
                       print(exception);   // todo should add a validation, show the exception
                     }
