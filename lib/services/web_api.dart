@@ -8,16 +8,28 @@ class WebApi {
   late final Uri _otpUrl;
   late final Uri _influencerSignUpUrl;
 
-
   WebApi() {
     this._emailUrl = Uri.parse(this._baseUri + "send-email/");
+    this._otpUrl = Uri.parse(this._baseUri + "check-otp/");
   }
 
   Future<void> sendEmail(String email) async {
-    http.Response response = await http.post(this._emailUrl, body: {'email': email});
+    Map body = {'email': email};
+    http.Response response = await http.post(this._emailUrl, body: body);
     if (response.statusCode != 201) {
       throw HttpException(response.body);
     }
   }
 
+  Future<void> checkOtp(String email, String otp) async {
+    int otpCode = int.parse(otp);
+    Map<String, dynamic> body = {
+      'email': email,
+      'otp_code': otpCode,
+    };
+    http.Response response = await http.post(this._otpUrl, body: body);
+    if (response.statusCode != 200) {
+      throw HttpException(response.body);
+    }
+  }
 }
