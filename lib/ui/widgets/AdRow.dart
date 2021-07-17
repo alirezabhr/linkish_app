@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../../models/Ad.dart';
+import '../../models/ad.dart';
 
 class AdRow extends StatefulWidget {
   @override

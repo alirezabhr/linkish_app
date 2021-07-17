@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../models/topic.dart';
 import '../../services/web_api.dart';
 import 'TopicChip.dart';
 
@@ -10,14 +11,14 @@ class TopicSelector extends StatefulWidget {
 
 class _TopicSelectorState extends State<TopicSelector> {
   String dropdownValue = "";
-  List<String> _topicList = [];
+  List<String> _topicsTitleList = [];
   List<String> _selectedItems = [];
 
   setData() async {
-    List<String> tmpList = await WebApi().getTopicsList();
+    List<Topic> topicsList = await WebApi().getTopicsList();  // todo should get it from provider
     setState(() {
-      this._topicList = tmpList;
-      this.dropdownValue = tmpList.first;
+      this._topicsTitleList = List.generate(topicsList.length, (index) => topicsList[index].title);
+      this.dropdownValue = topicsList.first.title;
     });
   }
 
@@ -29,19 +30,20 @@ class _TopicSelectorState extends State<TopicSelector> {
 
   @override
   Widget build(BuildContext context) {
-    return _topicList.isEmpty
+    return _topicsTitleList.isEmpty
         ? CircularProgressIndicator()
         : Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         DropdownButton<String>(
           value: dropdownValue,
-          items: _topicList.map((element) {
+          items: _topicsTitleList.map((element) {
             return DropdownMenuItem(value: element, child: Text(element));
           }).toList(),
           onChanged: (String? newValue) {
             setState(() {
-              _topicList.remove(newValue);
-              dropdownValue = _topicList.first;
+              _topicsTitleList.remove(newValue);
+              dropdownValue = _topicsTitleList.first;
               _selectedItems.add(newValue!);
             });
           },
