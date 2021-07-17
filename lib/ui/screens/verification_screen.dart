@@ -60,7 +60,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                       if (_formKey.currentState!.validate()) {
                         try {
                           // await WebApi().checkOtp(emailAddress, _otpController.text);  // checkOtp function has problem
-                          Navigator.pushReplacementNamed(context, "/registration");
+                          Navigator.pushReplacementNamed(context, "/registration", arguments: emailAddress);
                         } catch (exception) {
                           print(exception);   // todo should add a validation, show the exception
                         }
