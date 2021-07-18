@@ -1,30 +1,30 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 
 import '../models/topic.dart';
 import '../models/influencer.dart';
 
 class WebApi {
   final String _baseUrl = "http://192.168.1.9:8000/";
-  late final Uri _emailUrl;
-  late final Uri _otpUrl;
-  late final Uri _topicsUrl;
-  late final Uri _influencerSignUpUrl;
+  late final String _emailUrl;
+  late final String _otpUrl;
+  late final String _topicsUrl;
+  late final String _influencerSignUpUrl;
 
   WebApi() {
-    this._emailUrl = Uri.parse(this._baseUrl + "send-email/");
-    this._otpUrl = Uri.parse(this._baseUrl + "check-otp/");
-    this._topicsUrl = Uri.parse(this._baseUrl + "topic/");
-    this._influencerSignUpUrl = Uri.parse(this._baseUrl + "signup/influencer/");
+    this._emailUrl = this._baseUrl + "send-email/";
+    this._otpUrl = this._baseUrl + "check-otp/";
+    this._topicsUrl = this._baseUrl + "topic/";
+    this._influencerSignUpUrl = this._baseUrl + "signup/influencer/";
   }
 
   Future<void> sendEmail(String email) async {
     Map body = {'email': email};
-    http.Response response = await http.post(this._emailUrl, body: body);
+    Response response = await Dio().post(this._emailUrl, data: body);
     if (response.statusCode != 201) {
-      throw HttpException(response.body);
+      throw HttpException(response.data);
     }
   }
 
@@ -32,21 +32,21 @@ class WebApi {
     int otpCode = int.parse(otp);
     Map<String, dynamic> body = {
       'email': email,
-      'otp_code': "$otpCode",
+      'otp_code': otpCode,
     };
-    http.Response response = await http.post(this._otpUrl, body: body);
+    Response response = await Dio().post(this._otpUrl, data: body);
     if (response.statusCode != 200) {
-      throw HttpException(response.body);
+      throw HttpException(response.data);
     }
   }
 
   Future<List<Topic>> getTopicsList() async {
-    http.Response response = await http.get(this._topicsUrl);
+    Response response = await Dio().get(this._topicsUrl);
     if (response.statusCode != 200) {
-      throw HttpException(response.body);
+      throw HttpException(response.data);
     }
 
-    List responseBody = jsonDecode(response.body);
+    List responseBody = response.data;
     List<Topic> topics = List.generate(
         responseBody.length, (index) => Topic(responseBody[index]["id"], responseBody[index]["title"]));
 
@@ -56,18 +56,29 @@ class WebApi {
   Future<void> influencerSignup(Influencer influencer) async {
     List<int> topicsId = TopicList().getTopicsId(influencer.topicsList);
     print(topicsId);
+    int a = 2;
+    int b = 3;
+    List<int> list = [a,b];
     Map body = {
       "email": influencer.email,
       "password": influencer.password,
       "instagram_id": influencer.instagramId,
       "location": influencer.location,
-      "is_general_page": "${influencer.isGeneralPage}",
-      "topics": "${[2, 3]}",
+      "is_general_page": influencer.isGeneralPage,
+      "topics": list,
     };
 
-    http.Response response = await http.post(this._influencerSignUpUrl, body: body);
-    if (response.statusCode != 201) {
-      throw HttpException(response.body);
+    try {
+      Response response = await Dio().post(this._influencerSignUpUrl, data: body);
+      if (response.statusCode != 201) {
+        if (response.statusCode == 400) {
+          throw Exception("bad request in signup");
+        } else {
+          throw Exception("some problem in signup.[${response.statusCode}]");
+        }
+      }
+    } catch (e) {
+      print(e);
     }
   }
 }
