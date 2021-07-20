@@ -43,6 +43,8 @@ class _EmailScreenState extends State<EmailScreen> {
                   labelText: 'Email',
                 ),
                 keyboardType: TextInputType.emailAddress,
+                textAlign: TextAlign.center,
+                textDirection: TextDirection.ltr,
               ),
             ),
             Row(

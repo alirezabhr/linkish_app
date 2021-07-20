@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 
 import '../../services/web_api.dart';
 
@@ -35,6 +37,20 @@ class _VerificationScreenState extends State<VerificationScreen> {
                 ),
               ),
               Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      emailAddress,
+                      style: TextStyle(fontSize: 18),
+                      textAlign: TextAlign.left,
+                      textDirection: TextDirection.ltr,
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
                 padding:
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
                 child: TextFormField(
@@ -44,6 +60,8 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     labelText: 'OTP',
                   ),
                   keyboardType: TextInputType.number,
+                  textDirection: TextDirection.ltr,
+                  textAlign: TextAlign.center,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter some text';
@@ -59,9 +77,9 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     onPressed: ()async {
                       if (_formKey.currentState!.validate()) {
                         try {
-                          // await WebApi().checkOtp(emailAddress, _otpController.text);  // checkOtp function has problem
+                          // await WebApi().checkOtp(emailAddress, _otpController.text);
                           Navigator.pushReplacementNamed(context, "/registration", arguments: emailAddress);
-                        } catch (exception) {
+                        } on DioError catch (exception) {
                           print(exception);   // todo should add a validation, show the exception
                         }
                       }
