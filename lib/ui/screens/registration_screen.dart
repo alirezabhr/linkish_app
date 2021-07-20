@@ -1,9 +1,12 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../widgets/TopicSelector.dart';
-import '../../services/web_api.dart';
+import '../../models/topic.dart';
 import '../../models/influencer.dart';
+import '../../services/web_api.dart';
 
 enum InstagramPageType { general, pro }
 
@@ -13,14 +16,17 @@ class RegistrationScreen extends StatefulWidget {
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
+  late Influencer influencer;
   final _formKey = GlobalKey<FormState>();
   final _passwordController = TextEditingController();
+  bool _obscurePassword = true;
   final _igIdController = TextEditingController();
   final _locationController = TextEditingController();
   InstagramPageType? _pageType = InstagramPageType.general;
 
   @override
   Widget build(BuildContext context) {
+    influencer = Provider.of<Influencer>(context);
     String emailAddress = ModalRoute.of(context)!.settings.arguments as String;
     return Scaffold(
       appBar: AppBar(
@@ -45,12 +51,25 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       borderRadius: BorderRadius.circular(4),
                       // labelText: 'Password',
                     ),
-                    child: Text(
-                      emailAddress,
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.grey[700],
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "ایمیل:",
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                        Text(
+                          emailAddress,
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey[700],
+                          ),
+                          textDirection: TextDirection.ltr,
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -62,10 +81,25 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: 'Password',
+                      prefixIcon: IconButton(
+                        icon: _obscurePassword
+                            ? Icon(Icons.visibility)
+                            : Icon(Icons.visibility_off),
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
+                      ),
                     ),
+                    textDirection: TextDirection.ltr,
+                    obscureText: this._obscurePassword,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter some text';
+                      }
+                      if (value.length < 8) {
+                        return 'Password should be at least 8 characters';
                       }
                       return null;
                     },
@@ -80,6 +114,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       border: OutlineInputBorder(),
                       labelText: 'Instagram Id',
                     ),
+                    textDirection: TextDirection.ltr,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter some text';
@@ -142,18 +177,27 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     ElevatedButton(
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
-                          bool isGeneral = _pageType == InstagramPageType.general ? true : false;
+                          bool isGeneral =
+                              _pageType == InstagramPageType.general
+                                  ? true
+                                  : false;
                           try {
-                            Influencer influencer = Influencer(
-                              emailAddress, _passwordController.text,
-                              _igIdController.text, _locationController.text,
-                              isGeneral, [],
-                            );
-
-                            await WebApi().influencerSignup(influencer);
+                            Map data = {
+                              "email": emailAddress,
+                              "password": _passwordController.text,
+                              "instagram_id": _igIdController.text,
+                              "location": _locationController.text,
+                              "is_general_page": isGeneral,
+                              "topics": [Topic(2, "fake2"), Topic(5, "fake5")],
+                              // todo its fake. should change
+                            };
+                            String token = await WebApi().influencerSignup(data);
+                            influencer.setUserDat(data);
+                            influencer.setToken(token);
+                            influencer.registerUser();
                             Navigator.pushReplacementNamed(context, "/home");
-                          } catch (exception) {
-                            print(exception); // todo should add a validation, show the exception
+                          } on DioError catch (e) {
+                            print(e.response!.data); // todo should add a validation, show the exception
                           }
                         }
                       },
