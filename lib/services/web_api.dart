@@ -1,10 +1,8 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
 
 import '../models/topic.dart';
-import '../models/influencer.dart';
 
 class WebApi {
   final String _baseUrl = "http://192.168.1.9:8000/";
@@ -48,37 +46,28 @@ class WebApi {
 
     List responseBody = response.data;
     List<Topic> topics = List.generate(
-        responseBody.length, (index) => Topic(responseBody[index]["id"], responseBody[index]["title"]));
+      responseBody.length,
+      (index) => Topic(responseBody[index]["id"], responseBody[index]["title"]),
+    );
 
     return topics;
   }
 
-  Future<void> influencerSignup(Influencer influencer) async {
-    List<int> topicsId = TopicList().getTopicsId(influencer.topicsList);
-    print(topicsId);
-    int a = 2;
-    int b = 3;
-    List<int> list = [a,b];
+  Future<String> influencerSignup(Map data) async {
+    List<int> topicsPk = List.generate(data["topics"].length, (index) => data["topics"][index].id);
     Map body = {
-      "email": influencer.email,
-      "password": influencer.password,
-      "instagram_id": influencer.instagramId,
-      "location": influencer.location,
-      "is_general_page": influencer.isGeneralPage,
-      "topics": list,
+      "email": data['email'],
+      "password": data['password'],
+      "instagram_id": data['instagram_id'],
+      "location": data['location'],
+      "is_general_page": data['is_general_page'],
+      "topics": topicsPk,
     };
-
-    try {
-      Response response = await Dio().post(this._influencerSignUpUrl, data: body);
-      if (response.statusCode != 201) {
-        if (response.statusCode == 400) {
-          throw Exception("bad request in signup");
-        } else {
-          throw Exception("some problem in signup.[${response.statusCode}]");
-        }
-      }
-    } catch (e) {
-      print(e);
+    Response response = await Dio().post(this._influencerSignUpUrl, data: body);
+    if (response.statusCode == 201) {
+      String token = response.data["token"];
+      return token;
     }
+    return "Error";
   }
 }
