@@ -10,6 +10,7 @@ class AdRow extends StatefulWidget {
 }
 
 class _AdRowState extends State<AdRow> {
+  final int _userId = 3;
   bool _isLoading = true;
   List<Ad> _adsList = [];
   late Ad _ad;
@@ -17,7 +18,7 @@ class _AdRowState extends State<AdRow> {
   bool _hasBefore = false;
 
   getAds() async {
-    List<Ad> _list = await WebApi().getDisapprovedAds(3);
+    List<Ad> _list = await WebApi().getDisapprovedAds(this._userId);
     setState(() {
       this._adsList = _list;
 
@@ -122,7 +123,9 @@ class _AdRowState extends State<AdRow> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              WebApi().confirmAd(this._userId, this._ad.id);
+                            },
                             child: Text("Confirm"),
                             style: buttonStyle,
                           ),

@@ -13,6 +13,7 @@ class WebApi {
   late final String _topicsUrl;
   late final String _influencerSignUpUrl;
   late final String _influencerSuggestedAdUrl;
+  late final String _confirmAdUrl;
 
   WebApi() {
     this._emailUrl = this._baseUrl + "send-email/";
@@ -20,6 +21,7 @@ class WebApi {
     this._topicsUrl = this._baseUrl + "topic/";
     this._influencerSignUpUrl = this._baseUrl + "signup/influencer/";
     this._influencerSuggestedAdUrl = this._baseUrl + "ad/inf/";
+    this._confirmAdUrl = this._baseUrl + "ad/inf/";
   }
 
   Future<void> sendEmail(String email) async {
@@ -103,5 +105,17 @@ class WebApi {
     });
 
     return _adsList;
+  }
+
+  Future<void> confirmAd(int influencerPk, int suggestionId) async {
+    String url = this._confirmAdUrl + influencerPk.toString() + "/";
+    Map<String, dynamic> body = {
+      "suggested_ad": suggestionId,
+    };
+    try {
+      await Dio().post(url, data: body);
+    } on DioError catch (e) {
+      print(e.response);
+    }
   }
 }
