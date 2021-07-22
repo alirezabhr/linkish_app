@@ -3,8 +3,10 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 
 import '../models/topic.dart';
+import '../models/ad.dart';
 
 class WebApi {
+  static final String baseUrl = "http://192.168.1.9:8000";
   final String _baseUrl = "http://192.168.1.9:8000/";
   late final String _emailUrl;
   late final String _otpUrl;
@@ -73,15 +75,21 @@ class WebApi {
     return "Error";
   }
 
-  Future<List<Map>> getApprovedAds(int pk) async {
-    String url = this._influencerSuggestedAdUrl + pk.toString() + "/approved/";
+  Future<List<Map>> getApprovedAds(int influencerPk) async {
+    String url = this._influencerSuggestedAdUrl + influencerPk.toString() + "/approved/";
     Response response = await Dio().get(url);
     return response.data;
   }
 
-  Future<List<Map>> getDisapprovedAds(int pk) async {
-    String url = this._influencerSuggestedAdUrl + pk.toString() + "/dis-approved/";
+  Future<List<Ad>> getDisapprovedAds(int influencerPk) async {
+    String url = this._influencerSuggestedAdUrl + influencerPk.toString() + "/dis-approved/";
     Response response = await Dio().get(url);
-    return response.data;
+
+    List<Ad> _adsList = List.generate(response.data.length, (index) {
+      Map ad = response.data[index];
+      return Ad(ad["title"], ad["base_link"], ad["is_video"], ad["image"], []);
+    });
+
+    return _adsList;
   }
 }
