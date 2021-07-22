@@ -1,10 +1,12 @@
 class Ad {
+  late int id;
   String _title;
   String _baseLink;
   List<String> _topics;
   bool _isVideo;
   String _imageUrl;
   late String videoUrl;
+  late String shortLink;
 
   Ad(this._title, this._baseLink, this._isVideo, this._imageUrl, this._topics);
 
