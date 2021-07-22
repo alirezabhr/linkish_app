@@ -34,7 +34,6 @@ class Influencer with ChangeNotifier {
 
   Future<void> getUserDataSharedPref() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    print(prefs);
     _isRegistered = prefs.getBool("is_registered")!;
     _token = prefs.getString("token")!;
     _email = prefs.getString("email")!;
