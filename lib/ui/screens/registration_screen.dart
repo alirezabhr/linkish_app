@@ -24,6 +24,36 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _locationController = TextEditingController();
   InstagramPageType? _pageType = InstagramPageType.general;
 
+  List<Topic> _topicsList = [];
+  List<Topic> _selectedTopicsList = [];
+
+  void appendItem(Topic value) {
+    setState(() {
+      this._topicsList.remove(value);
+      this._selectedTopicsList.add(value);
+      this._topicsList.sort((a, b) => a.title.compareTo(b.title));
+    });
+  }
+  void removeItem(Topic value) {
+    setState(() {
+      this._topicsList.add(value);
+      this._selectedTopicsList.remove(value);
+      this._topicsList.sort((a, b) => a.title.compareTo(b.title));
+    });
+  }
+
+  setData() async {
+    List<Topic> topicsList = await WebApi().getTopicsList();
+    this._topicsList = topicsList;
+    this._topicsList.sort((a, b) => a.title.compareTo(b.title));
+  }
+
+  @override
+  void initState() {
+    this.setData();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     influencer = Provider.of<Influencer>(context);
@@ -151,6 +181,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       });
                     },
                   ),
+                  onTap: () {
+                    setState(() {
+                      _pageType = InstagramPageType.general;
+                    });
+                  },
                 ),
                 ListTile(
                   title: const Text('My Page Is Professional'),
@@ -163,12 +198,17 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       });
                     },
                   ),
+                  onTap: () {
+                    setState(() {
+                      _pageType = InstagramPageType.pro;
+                    });
+                  },
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(
                       vertical: 2.0, horizontal: 16.0),
                   child: _pageType == InstagramPageType.pro
-                      ? TopicSelector()
+                      ? TopicSelector(this._topicsList, this._selectedTopicsList, this.appendItem, this.removeItem)
                       : null,
                 ),
                 Row(
@@ -188,8 +228,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               "instagram_id": _igIdController.text,
                               "location": _locationController.text,
                               "is_general_page": isGeneral,
-                              "topics": [Topic(2, "fake2"), Topic(5, "fake5")],
-                              // todo its fake. should change
+                              "topics": this._selectedTopicsList,
                             };
                             String token = await WebApi().influencerSignup(data);
                             influencer.setUserDat(data);

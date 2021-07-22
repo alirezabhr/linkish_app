@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
-class TopicChip extends StatelessWidget {
-  final String label;
+import '../../models/topic.dart';
 
-  TopicChip(this.label);
+class TopicChip extends StatelessWidget {
+  final Topic _topic;
+  final Function(Topic) removeFunc;
+
+  TopicChip(this._topic, this.removeFunc);
 
   @override
   Widget build(BuildContext context) {
@@ -11,10 +14,10 @@ class TopicChip extends StatelessWidget {
       labelPadding: EdgeInsets.all(2.0),
       avatar: CircleAvatar(
         backgroundColor: Colors.white70,
-        child: Text(label[0].toUpperCase()),
+        child: Text(this._topic.title[0].toUpperCase()),
       ),
       label: Text(
-        label,
+        this._topic.title,
         style: TextStyle(
           color: Colors.black,
         ),
@@ -24,15 +27,11 @@ class TopicChip extends StatelessWidget {
       shadowColor: Colors.grey[60],
       padding: EdgeInsets.all(8.0),
       onDeleted: () {
-        removeItem();
+        this.removeFunc(this._topic);
       },
       onPressed: () {
-        removeItem();
+        this.removeFunc(this._topic);
       },
     );
-  }
-
-  removeItem() {
-    print("hellp");
   }
 }

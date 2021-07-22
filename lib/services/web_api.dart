@@ -10,12 +10,14 @@ class WebApi {
   late final String _otpUrl;
   late final String _topicsUrl;
   late final String _influencerSignUpUrl;
+  late final String _influencerSuggestedAdUrl;
 
   WebApi() {
     this._emailUrl = this._baseUrl + "send-email/";
     this._otpUrl = this._baseUrl + "check-otp/";
     this._topicsUrl = this._baseUrl + "topic/";
     this._influencerSignUpUrl = this._baseUrl + "signup/influencer/";
+    this._influencerSuggestedAdUrl = this._baseUrl + "ad/inf/";
   }
 
   Future<void> sendEmail(String email) async {
@@ -69,5 +71,17 @@ class WebApi {
       return token;
     }
     return "Error";
+  }
+
+  Future<List<Map>> getApprovedAds(int pk) async {
+    String url = this._influencerSuggestedAdUrl + pk.toString() + "/approved/";
+    Response response = await Dio().get(url);
+    return response.data;
+  }
+
+  Future<List<Map>> getDisapprovedAds(int pk) async {
+    String url = this._influencerSuggestedAdUrl + pk.toString() + "/dis-approved/";
+    Response response = await Dio().get(url);
+    return response.data;
   }
 }
