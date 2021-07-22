@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../../models/ad.dart';
+import '../../models/suggested_ad.dart';
 import '../../services/web_api.dart';
 
 class AdRow extends StatefulWidget {
@@ -12,19 +12,25 @@ class AdRow extends StatefulWidget {
 class _AdRowState extends State<AdRow> {
   final int _userId = 3;
   bool _isLoading = true;
-  List<Ad> _adsList = [];
-  late Ad _ad;
+  List<SuggestedAd> _allSuggestedAdsList = [];
+  List<SuggestedAd> _suggestedAdsList = [];
+  late SuggestedAd _suggestedAd;
   bool _hasNext = false;
   bool _hasBefore = false;
 
   getAds() async {
-    List<Ad> _list = await WebApi().getDisapprovedAds(this._userId);
+    List<SuggestedAd> _list = await WebApi().getSuggestedAds(_userId);
     setState(() {
-      this._adsList = _list;
+      this._allSuggestedAdsList = _list;
+      for (SuggestedAd item in _allSuggestedAdsList) {
+        if (!item.isApproved) {
+          this._suggestedAdsList.add(item);
+        }
+      }
 
-      if (_list.length > 0) {
-        this._ad = _adsList.first;
-        if (_adsList.last != _ad) {
+      if (_suggestedAdsList.length > 0) {
+        this._suggestedAd = _suggestedAdsList.first;
+        if (_suggestedAdsList.last != this._suggestedAd) {
           this._hasNext = true;
         }
       }
@@ -34,11 +40,12 @@ class _AdRowState extends State<AdRow> {
   }
 
   showPreviousAd() {
-    int index = _adsList.indexOf(_ad);
+    int index =
+        _suggestedAdsList.indexOf(_suggestedAd);
     setState(() {
-      _ad = _adsList[index - 1];
+      _suggestedAd = _suggestedAdsList[index - 1];
       _hasNext = true;
-      if (_adsList.first == _ad) {
+      if (_suggestedAdsList.first == _suggestedAd) {
         _hasBefore = false;
       } else {
         _hasBefore = true;
@@ -47,11 +54,12 @@ class _AdRowState extends State<AdRow> {
   }
 
   showNextAd() {
-    int index = _adsList.indexOf(_ad);
+    int index =
+        _suggestedAdsList.indexOf(_suggestedAd);
     setState(() {
-      _ad = _adsList[index + 1];
+      _suggestedAd = _suggestedAdsList[index + 1];
       _hasBefore = true;
-      if (_adsList.last == _ad) {
+      if (_suggestedAdsList.last == _suggestedAd) {
         _hasNext = false;
       } else {
         _hasNext = true;
@@ -75,14 +83,18 @@ class _AdRowState extends State<AdRow> {
     return Container(
       child: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : _adsList.isEmpty
-              ? Center(child: Text("No Suggested Ads", style: TextStyle(fontSize: 24),))
+          : _suggestedAdsList.isEmpty
+              ? Center(
+                  child: Text(
+                  "No Suggested Ads",
+                  style: TextStyle(fontSize: 24),
+                ))
               : Column(
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(14.0),
                       child: Text(
-                        this._ad.title,
+                        this._suggestedAd.ad.title,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 20,
@@ -105,7 +117,7 @@ class _AdRowState extends State<AdRow> {
                             width: width * 0.65,
                             decoration: BoxDecoration(border: Border.all()),
                             child: Image.network(
-                                "${WebApi.baseUrl}${_ad.imageUrl}"),
+                                "${WebApi.baseUrl}${_suggestedAd.ad.imageUrl}"),
                           ),
                           IconButton(
                             // left button
@@ -124,7 +136,8 @@ class _AdRowState extends State<AdRow> {
                         children: [
                           ElevatedButton(
                             onPressed: () {
-                              WebApi().confirmAd(this._userId, this._ad.id);
+                              WebApi().confirmAd(this._userId, this._suggestedAd.id);
+                              getAds();
                             },
                             child: Text("Confirm"),
                             style: buttonStyle,

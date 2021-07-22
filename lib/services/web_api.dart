@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 
 import '../models/topic.dart';
 import '../models/ad.dart';
+import '../models/suggested_ad.dart';
 
 class WebApi {
   static final String baseUrl = "http://192.168.1.9:8000";
@@ -105,6 +106,26 @@ class WebApi {
     });
 
     return _adsList;
+  }
+
+  Future<List<SuggestedAd>> getSuggestedAds(int influencerPk) async {
+    String url = this._influencerSuggestedAdUrl + influencerPk.toString() + "/";
+    Response response = await Dio().get(url);
+
+    List<SuggestedAd> _suggestedAdsList = List.generate(response.data.length, (index) {
+      Map adMap = response.data[index]["ad"];
+      Ad ad = Ad(adMap["title"], adMap["base_link"], adMap["is_video"], adMap["image"], []);
+      ad.id = adMap["id"];
+      ad.videoUrl = adMap["video"];
+
+      int _id = response.data[index]["id"];
+      bool _isApproved = response.data[index]["is_approved"];
+      String _suggestedAt = response.data[index]["suggested_at"];
+
+      return SuggestedAd(_id, _isApproved, _suggestedAt, ad);
+    });
+
+    return _suggestedAdsList;
   }
 
   Future<void> confirmAd(int influencerPk, int suggestionId) async {
