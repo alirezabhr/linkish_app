@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../widgets/AdRow.dart';
+import '../screens/suggested_ad_screen.dart';
+import '../screens/approved_ad_screen.dart';
+import '../screens/wallet_screen.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -9,6 +11,20 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
+  final List<Widget> _widgetOptions = <Widget>[
+    SuggestedAdScreen(),
+    ApprovedAdScreen(),
+    WalletScreen(),
+    Text("last screen"),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,18 +35,30 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       drawer: Drawer(),
-      body: Container(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
-              child: AdRow(),
-            ),
-          ],
-        ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_rounded, color: Colors.orange),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.check_circle_outline, color: Colors.orange),
+            label: 'Approved Ads',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_balance_wallet_outlined, color: Colors.orange),
+            label: 'Wallet',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings, color: Colors.orange),
+            label: 'Settings',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.orange[700],
+        onTap: _onItemTapped,
       ),
+      body: _widgetOptions[_selectedIndex],
     );
   }
 }
