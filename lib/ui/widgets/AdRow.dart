@@ -1,9 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:linkish/ui/widgets/ReportDialog.dart';
+import 'package:linkish/ui/widgets/ad_detail.dart';
+
+import '../widgets/ReportDialog.dart';
 
 import '../../models/suggested_ad.dart';
+import '../../models/influencer_ad.dart';
 import '../../services/web_api.dart';
+import '../../services/utils.dart';
 
 class AdRow extends StatefulWidget {
   @override
@@ -11,10 +15,11 @@ class AdRow extends StatefulWidget {
 }
 
 class _AdRowState extends State<AdRow> {
-  final int _userId = 8;
+  final int _userId = 6;
   bool _isLoading = true;
-  List<SuggestedAd> _allSuggestedAdsList = [];
+  bool _hasActiveAd = false;
   List<SuggestedAd> _suggestedAdsList = [];
+  late InfluencerAd _activeAd;
   late SuggestedAd _suggestedAd;
   bool _hasNext = false;
   bool _hasBefore = false;
@@ -23,13 +28,19 @@ class _AdRowState extends State<AdRow> {
     setState(() {
       _hasNext = false;
       _hasBefore = false;
+      _hasActiveAd = false;
       _isLoading = true;
     });
-    List<SuggestedAd> _list = await WebApi().getSuggestedAds(_userId);
+    List<InfluencerAd> _list1 = await WebApi().getApprovedAds(_userId);
+    List<SuggestedAd> _list2 = await WebApi().getSuggestedAds(_userId);
     setState(() {
-      this._allSuggestedAdsList = _list;
+      _activeAd = _list1.last;
+      if (isActiveAd(_activeAd)) {
+        _hasActiveAd = true;
+      }
+
       this._suggestedAdsList = [];
-      for (SuggestedAd item in _allSuggestedAdsList) {
+      for (SuggestedAd item in _list2) {
         if (!item.isApproved) {
           this._suggestedAdsList.add(item);
         }
@@ -88,6 +99,7 @@ class _AdRowState extends State<AdRow> {
     return Container(
       child: _isLoading
           ? Center(child: CircularProgressIndicator())
+          : _hasActiveAd ? AdDetail(this._activeAd)
           : _suggestedAdsList.isEmpty
               ? Center(
                   child: Text(
@@ -97,7 +109,7 @@ class _AdRowState extends State<AdRow> {
               : Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.all(14.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
                       child: Text(
                         this._suggestedAd.ad.title,
                         style: TextStyle(
@@ -107,6 +119,7 @@ class _AdRowState extends State<AdRow> {
                       ),
                     ),
                     Container(
+                      padding: EdgeInsets.symmetric(vertical: 6.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -141,9 +154,12 @@ class _AdRowState extends State<AdRow> {
                         children: [
                           ElevatedButton(
                             onPressed: () async {
-                              await WebApi().confirmAd(
-                                  this._userId, this._suggestedAd.id);
-                              await getAds();
+                              // await WebApi().confirmAd(
+                              //     this._userId, this._suggestedAd.id);
+                              // await getAds();
+                              List<InfluencerAd> _infList = await WebApi().getApprovedAds(this._userId);
+                              InfluencerAd _approvedAd = _infList.last;
+                              Navigator.of(context).pushNamed('/detail', arguments: _approvedAd);
                             },
                             child: Text("Confirm"),
                             style: buttonStyle,
@@ -162,6 +178,7 @@ class _AdRowState extends State<AdRow> {
                                     context: context,
                                     builder: (context) => ReportDialog(
                                         this._userId, this._suggestedAd.id));
+                                // todo callback function for refreshing
                               },
                               child: Text("Report"),
                               style: buttonStyle),
