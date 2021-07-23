@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:linkish/ui/widgets/ReportDialog.dart';
 
 import '../../models/suggested_ad.dart';
 import '../../services/web_api.dart';
@@ -10,7 +11,7 @@ class AdRow extends StatefulWidget {
 }
 
 class _AdRowState extends State<AdRow> {
-  final int _userId = 6;
+  final int _userId = 8;
   bool _isLoading = true;
   List<SuggestedAd> _allSuggestedAdsList = [];
   List<SuggestedAd> _suggestedAdsList = [];
@@ -149,11 +150,16 @@ class _AdRowState extends State<AdRow> {
                             style: buttonStyle,
                           ),
                           ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () async {
+                                await WebApi().rejectAd(this._userId, this._suggestedAd.id);
+                                await getAds();
+                              },
                               child: Text("Reject"),
                               style: buttonStyle),
                           ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                showDialog<void>(context: context, builder: (context) => ReportDialog());
+                              },
                               child: Text("Report"),
                               style: buttonStyle),
                         ],

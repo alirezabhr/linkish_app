@@ -109,4 +109,17 @@ class WebApi {
       print(e.response);
     }
   }
+
+  Future<void> rejectAd(int influencerPk, int suggestionId) async {
+    String url = this._confirmAdUrl + influencerPk.toString() + "/";
+    Map<String, dynamic> body = {
+      "suggested_ad": suggestionId,
+      "is_rejected": true,
+    };
+    try {
+      await Dio().put(url, data: body);
+    } on DioError catch (e) {
+      print(e.response);
+    }
+  }
 }
