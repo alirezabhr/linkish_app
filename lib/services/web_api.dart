@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import '../models/topic.dart';
 import '../models/ad.dart';
 import '../models/suggested_ad.dart';
+import '../models/influencer_ad.dart';
 
 class WebApi {
   static final String baseUrl = "http://192.168.1.9:8000";
@@ -15,6 +16,7 @@ class WebApi {
   late final String _influencerSignUpUrl;
   late final String _influencerSuggestedAdUrl;
   late final String _confirmAdUrl;
+  late final String _baseShortLink;
 
   WebApi() {
     this._emailUrl = this._baseUrl + "send-email/";
@@ -23,6 +25,7 @@ class WebApi {
     this._influencerSignUpUrl = this._baseUrl + "signup/influencer/";
     this._influencerSuggestedAdUrl = this._baseUrl + "ad/inf/";
     this._confirmAdUrl = this._baseUrl + "ad/inf/";
+    this._baseShortLink = this._baseUrl + "ad/ia/";
   }
 
   Future<void> sendEmail(String email) async {
@@ -96,6 +99,26 @@ class WebApi {
     });
 
     return _suggestedAdsList;
+  }
+
+  Future<List<InfluencerAd>> getApprovedAds(int influencerPk) async {
+    String url = this._influencerSuggestedAdUrl + influencerPk.toString() + "/approved/";
+    Response response = await Dio().get(url);
+
+    List<InfluencerAd> _approvedAdList = List.generate(response.data.length, (index) {
+      Map adMap = response.data[index]["suggested_ad"]["ad"];
+      Ad ad = Ad(adMap["title"], adMap["base_link"], adMap["is_video"], adMap["image"], []);
+      ad.id = adMap["id"];
+      ad.videoUrl = adMap["video"];
+
+      String _shortUrl = this._baseShortLink + response.data[index]["short_link"];
+      int _clicks = response.data[index]["clicks"];
+      String _approvedAt = response.data[index]["approved_at"];
+
+      return InfluencerAd(_shortUrl, _clicks, _approvedAt, ad);
+    });
+
+    return _approvedAdList;
   }
 
   Future<void> confirmAd(int influencerPk, int suggestionId) async {
