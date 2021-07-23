@@ -78,36 +78,6 @@ class WebApi {
     return "Error";
   }
 
-  Future<List<Ad>> getApprovedAds(int influencerPk) async {
-    String url = this._influencerSuggestedAdUrl + influencerPk.toString() + "/approved/";
-    Response response = await Dio().get(url);
-
-    List<Ad> _adsList = List.generate(response.data.length, (index) {
-      Map adMap = response.data[index]["ad"];
-      Ad ad = Ad(adMap["title"], adMap["base_link"], adMap["is_video"], adMap["image"], []);
-      ad.id = adMap["id"];
-      ad.videoUrl = adMap["video"];
-      ad.shortLink = response.data[index]["short_link"];
-      return ad;
-    });
-
-    return _adsList;
-  }
-
-  Future<List<Ad>> getDisapprovedAds(int influencerPk) async {
-    String url = this._influencerSuggestedAdUrl + influencerPk.toString() + "/dis-approved/";
-    Response response = await Dio().get(url);
-
-    List<Ad> _adsList = List.generate(response.data.length, (index) {
-      Map adMap = response.data[index];
-      Ad ad = Ad(adMap["title"], adMap["base_link"], adMap["is_video"], adMap["image"], []);
-      ad.id = adMap["id"];
-      return ad;
-    });
-
-    return _adsList;
-  }
-
   Future<List<SuggestedAd>> getSuggestedAds(int influencerPk) async {
     String url = this._influencerSuggestedAdUrl + influencerPk.toString() + "/";
     Response response = await Dio().get(url);
