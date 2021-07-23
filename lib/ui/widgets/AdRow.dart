@@ -10,7 +10,7 @@ class AdRow extends StatefulWidget {
 }
 
 class _AdRowState extends State<AdRow> {
-  final int _userId = 3;
+  final int _userId = 6;
   bool _isLoading = true;
   List<SuggestedAd> _allSuggestedAdsList = [];
   List<SuggestedAd> _suggestedAdsList = [];
@@ -19,9 +19,15 @@ class _AdRowState extends State<AdRow> {
   bool _hasBefore = false;
 
   getAds() async {
+    setState(() {
+      _hasNext = false;
+      _hasBefore = false;
+      _isLoading = true;
+    });
     List<SuggestedAd> _list = await WebApi().getSuggestedAds(_userId);
     setState(() {
       this._allSuggestedAdsList = _list;
+      this._suggestedAdsList = [];
       for (SuggestedAd item in _allSuggestedAdsList) {
         if (!item.isApproved) {
           this._suggestedAdsList.add(item);
@@ -135,9 +141,9 @@ class _AdRowState extends State<AdRow> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           ElevatedButton(
-                            onPressed: () {
-                              WebApi().confirmAd(this._userId, this._suggestedAd.id);
-                              getAds();
+                            onPressed: () async {
+                              await WebApi().confirmAd(this._userId, this._suggestedAd.id);
+                              await getAds();
                             },
                             child: Text("Confirm"),
                             style: buttonStyle,
