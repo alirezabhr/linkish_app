@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../screens/suggested_ad_screen.dart';
 import '../screens/approved_ad_screen.dart';
 import '../screens/wallet_screen.dart';
+import '../screens/profile_screen.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -16,7 +17,7 @@ class _HomePageState extends State<HomePage> {
     SuggestedAdScreen(),
     ApprovedAdScreen(),
     WalletScreen(),
-    Text("last screen"),
+    ProfileScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -50,8 +51,8 @@ class _HomePageState extends State<HomePage> {
             label: 'Wallet',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings, color: Colors.orange),
-            label: 'Settings',
+            icon: Icon(Icons.person, color: Colors.orange),
+            label: 'Profile',
           ),
         ],
         currentIndex: _selectedIndex,
