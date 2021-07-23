@@ -122,4 +122,18 @@ class WebApi {
       print(e.response);
     }
   }
+
+  Future<void> reportAd(int influencerPk, int suggestionId, String reportMsg) async {
+    String url = this._confirmAdUrl + influencerPk.toString() + "/";
+    Map<String, dynamic> body = {
+      "suggested_ad": suggestionId,
+      "is_reported": true,
+      "report_msg": reportMsg,
+    };
+    try {
+      await Dio().put(url, data: body);
+    } on DioError catch (e) {
+      print(e.response);
+    }
+  }
 }

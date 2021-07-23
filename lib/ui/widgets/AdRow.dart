@@ -47,8 +47,7 @@ class _AdRowState extends State<AdRow> {
   }
 
   showPreviousAd() {
-    int index =
-        _suggestedAdsList.indexOf(_suggestedAd);
+    int index = _suggestedAdsList.indexOf(_suggestedAd);
     setState(() {
       _suggestedAd = _suggestedAdsList[index - 1];
       _hasNext = true;
@@ -61,8 +60,7 @@ class _AdRowState extends State<AdRow> {
   }
 
   showNextAd() {
-    int index =
-        _suggestedAdsList.indexOf(_suggestedAd);
+    int index = _suggestedAdsList.indexOf(_suggestedAd);
     setState(() {
       _suggestedAd = _suggestedAdsList[index + 1];
       _hasBefore = true;
@@ -143,7 +141,8 @@ class _AdRowState extends State<AdRow> {
                         children: [
                           ElevatedButton(
                             onPressed: () async {
-                              await WebApi().confirmAd(this._userId, this._suggestedAd.id);
+                              await WebApi().confirmAd(
+                                  this._userId, this._suggestedAd.id);
                               await getAds();
                             },
                             child: Text("Confirm"),
@@ -151,14 +150,18 @@ class _AdRowState extends State<AdRow> {
                           ),
                           ElevatedButton(
                               onPressed: () async {
-                                await WebApi().rejectAd(this._userId, this._suggestedAd.id);
+                                await WebApi().rejectAd(
+                                    this._userId, this._suggestedAd.id);
                                 await getAds();
                               },
                               child: Text("Reject"),
                               style: buttonStyle),
                           ElevatedButton(
                               onPressed: () {
-                                showDialog<void>(context: context, builder: (context) => ReportDialog());
+                                showDialog<void>(
+                                    context: context,
+                                    builder: (context) => ReportDialog(
+                                        this._userId, this._suggestedAd.id));
                               },
                               child: Text("Report"),
                               style: buttonStyle),
