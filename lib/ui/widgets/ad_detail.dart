@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -61,10 +62,10 @@ class _AdDetailState extends State<AdDetail> {
       if (await directory.exists()) {
         await Dio().download(url, saveFile.path,
             onReceiveProgress: (value1, value2) {
-              setState(() {
-                progress = (value1 / value2) * 100;
-              });
-            });
+          setState(() {
+            progress = (value1 / value2) * 100;
+          });
+        });
         if (Platform.isIOS) {
           await ImageGallerySaver.saveFile(saveFile.path,
               isReturnPathOfIOS: true);
@@ -111,10 +112,20 @@ class _AdDetailState extends State<AdDetail> {
     }
   }
 
+  Future<void> _copyToClipboard(String text) async {
+    await Clipboard.setData(ClipboardData(text: text));
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Copied to clipboard'),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final String remainingTime =
-    calculateRemainTime(this.widget.influencerAd.approvedAt);
+        calculateRemainTime(this.widget.influencerAd.approvedAt);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -149,7 +160,9 @@ class _AdDetailState extends State<AdDetail> {
                 ),
                 ElevatedButton.icon(
                   icon: Icon(Icons.copy),
-                  onPressed: () {},
+                  onPressed: () async {
+                    await _copyToClipboard(widget.influencerAd.shortLink);
+                  },
                   label: Text("copy"),
                 ),
               ],
@@ -160,12 +173,10 @@ class _AdDetailState extends State<AdDetail> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Padding(
-                  padding:
-                  const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 12.0, horizontal: 8.0),
                   child: Text(
-                    "media type: ${widget.influencerAd.ad.isVideo
-                        ? "video"
-                        : "image"}",
+                    "media type: ${widget.influencerAd.ad.isVideo ? "video" : "image"}",
                     style: TextStyle(fontSize: 16),
                   ),
                 ),
@@ -183,8 +194,11 @@ class _AdDetailState extends State<AdDetail> {
               ],
             ),
           ),
-          Text(_isDownloading ? "progress: $progress%" : _isDownloaded
-              ? "Successfully downloaded" : ""),
+          Text(_isDownloading
+              ? "progress: $progress%"
+              : _isDownloaded
+                  ? "Successfully downloaded"
+                  : ""),
           Container(
             padding: const EdgeInsets.all(16.0),
             child: Text(
