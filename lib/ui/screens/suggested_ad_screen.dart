@@ -14,7 +14,7 @@ class SuggestedAdScreen extends StatelessWidget {
         children: [
           Padding(
             padding:
-            const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
+            const EdgeInsets.symmetric(horizontal: 4.0),
             child: AdRow(),
           ),
         ],

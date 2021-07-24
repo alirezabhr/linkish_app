@@ -154,12 +154,8 @@ class _AdRowState extends State<AdRow> {
                         children: [
                           ElevatedButton(
                             onPressed: () async {
-                              // await WebApi().confirmAd(
-                              //     this._userId, this._suggestedAd.id);
-                              // await getAds();
-                              List<InfluencerAd> _infList = await WebApi().getApprovedAds(this._userId);
-                              InfluencerAd _approvedAd = _infList.last;
-                              Navigator.of(context).pushNamed('/detail', arguments: _approvedAd);
+                              await WebApi().confirmAd(this._userId, this._suggestedAd.id);
+                              await getAds();
                             },
                             child: Text("Confirm"),
                             style: buttonStyle,
