@@ -1,8 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:linkish/ui/widgets/ad_detail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/ReportDialog.dart';
+import '../widgets/ad_detail.dart';
 
 import '../../models/suggested_ad.dart';
 import '../../models/influencer_ad.dart';
@@ -15,7 +16,7 @@ class AdRow extends StatefulWidget {
 }
 
 class _AdRowState extends State<AdRow> {
-  final int _userId = 6;
+  int _userId = 0;
   bool _isLoading = true;
   bool _hasActiveAd = false;
   List<SuggestedAd> _suggestedAdsList = [];
@@ -24,7 +25,16 @@ class _AdRowState extends State<AdRow> {
   bool _hasNext = false;
   bool _hasBefore = false;
 
+  setUserId() async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    _userId = _prefs.getInt("id")!;
+  }
+
   getAds() async {
+    if (_userId == 0) {
+      await this.setUserId();
+    }
+
     setState(() {
       _hasNext = false;
       _hasBefore = false;
@@ -34,9 +44,11 @@ class _AdRowState extends State<AdRow> {
     List<InfluencerAd> _list1 = await WebApi().getApprovedAds(_userId);
     List<SuggestedAd> _list2 = await WebApi().getSuggestedAds(_userId);
     setState(() {
-      _activeAd = _list1.last;
-      if (isActiveAd(_activeAd)) {
-        _hasActiveAd = true;
+      if (_list1.isNotEmpty) {
+        _activeAd = _list1.last;
+        if (isActiveAd(_activeAd)) {
+          _hasActiveAd = true;
+        }
       }
 
       this._suggestedAdsList = [];

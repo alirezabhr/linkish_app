@@ -1,4 +1,5 @@
 import 'package:linkish/models/influencer_ad.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 bool isActiveAd(InfluencerAd ad) {
   String adDateTime = ad.approvedAt.substring(0, 26);
@@ -22,4 +23,10 @@ String calculateRemainTime(String timeStr) {
   Duration diff = time.difference(now);
 
   return "${diff.inHours}:${diff.inMinutes - (diff.inHours*60)}";
+}
+
+Future<String?> getUserToken() async {
+  SharedPreferences _prefs = await SharedPreferences.getInstance();
+  String? token = _prefs.getString("token");
+  return token;
 }

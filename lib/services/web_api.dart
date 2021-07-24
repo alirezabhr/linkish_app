@@ -1,6 +1,6 @@
-import 'dart:io';
-
 import 'package:dio/dio.dart';
+
+import '../services/utils.dart';
 
 import '../models/topic.dart';
 import '../models/ad.dart';
@@ -30,10 +30,7 @@ class WebApi {
 
   Future<void> sendEmail(String email) async {
     Map body = {'email': email};
-    Response response = await Dio().post(this._emailUrl, data: body);
-    if (response.statusCode != 201) {
-      throw HttpException(response.data);
-    }
+    await Dio().post(this._emailUrl, data: body);
   }
 
   Future<void> checkOtp(String email, String otp) async {
@@ -42,17 +39,11 @@ class WebApi {
       'email': email,
       'otp_code': otpCode,
     };
-    Response response = await Dio().post(this._otpUrl, data: body);
-    if (response.statusCode != 200) {
-      throw HttpException(response.data);
-    }
+    await Dio().post(this._otpUrl, data: body);
   }
 
   Future<List<Topic>> getTopicsList() async {
     Response response = await Dio().get(this._topicsUrl);
-    if (response.statusCode != 200) {
-      throw HttpException(response.data);
-    }
 
     List responseBody = response.data;
     List<Topic> topics = List.generate(
@@ -63,7 +54,7 @@ class WebApi {
     return topics;
   }
 
-  Future<String> influencerSignup(Map data) async {
+  Future<Map> influencerSignup(Map data) async {
     List<int> topicsPk = List.generate(data["topics"].length, (index) => data["topics"][index].id);
     Map body = {
       "email": data['email'],
@@ -74,16 +65,14 @@ class WebApi {
       "topics": topicsPk,
     };
     Response response = await Dio().post(this._influencerSignUpUrl, data: body);
-    if (response.statusCode == 201) {
-      String token = response.data["token"];
-      return token;
-    }
-    return "Error";
+    return response.data;
   }
 
   Future<List<SuggestedAd>> getSuggestedAds(int influencerPk) async {
+    Dio dio = Dio();
+    dio.options.headers["authorization"] = await getUserToken();
     String url = this._influencerSuggestedAdUrl + influencerPk.toString() + "/";
-    Response response = await Dio().get(url);
+    Response response = await dio.get(url);
 
     List<SuggestedAd> _suggestedAdsList = List.generate(response.data.length, (index) {
       Map adMap = response.data[index]["ad"];
@@ -102,8 +91,10 @@ class WebApi {
   }
 
   Future<List<InfluencerAd>> getApprovedAds(int influencerPk) async {
+    Dio dio = Dio();
+    dio.options.headers["authorization"] = await getUserToken();
     String url = this._influencerSuggestedAdUrl + influencerPk.toString() + "/approved/";
-    Response response = await Dio().get(url);
+    Response response = await dio.get(url);
 
     List<InfluencerAd> _approvedAdList = List.generate(response.data.length, (index) {
       Map adMap = response.data[index]["suggested_ad"]["ad"];
@@ -122,31 +113,37 @@ class WebApi {
   }
 
   Future<void> confirmAd(int influencerPk, int suggestionId) async {
+    Dio dio = Dio();
+    dio.options.headers["authorization"] = await getUserToken();
     String url = this._confirmAdUrl + influencerPk.toString() + "/";
     Map<String, dynamic> body = {
       "suggested_ad": suggestionId,
     };
     try {
-      await Dio().post(url, data: body);
+      await dio.post(url, data: body);
     } on DioError catch (e) {
       print(e.response);
     }
   }
 
   Future<void> rejectAd(int influencerPk, int suggestionId) async {
+    Dio dio = Dio();
+    dio.options.headers["authorization"] = await getUserToken();
     String url = this._confirmAdUrl + influencerPk.toString() + "/";
     Map<String, dynamic> body = {
       "suggested_ad": suggestionId,
       "is_rejected": true,
     };
     try {
-      await Dio().put(url, data: body);
+      await dio.put(url, data: body);
     } on DioError catch (e) {
       print(e.response);
     }
   }
 
   Future<void> reportAd(int influencerPk, int suggestionId, String reportMsg) async {
+    Dio dio = Dio();
+    dio.options.headers["authorization"] = await getUserToken();
     String url = this._confirmAdUrl + influencerPk.toString() + "/";
     Map<String, dynamic> body = {
       "suggested_ad": suggestionId,
@@ -154,7 +151,7 @@ class WebApi {
       "report_msg": reportMsg,
     };
     try {
-      await Dio().put(url, data: body);
+      await dio.put(url, data: body);
     } on DioError catch (e) {
       print(e.response);
     }

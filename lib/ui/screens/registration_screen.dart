@@ -87,17 +87,19 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         Text(
                           "ایمیل:",
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
                             color: Colors.grey[700],
                           ),
                         ),
-                        Text(
-                          emailAddress,
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.grey[700],
+                        FittedBox(
+                          child: Text(
+                            emailAddress,
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.grey[700],
+                            ),
+                            textDirection: TextDirection.ltr,
                           ),
-                          textDirection: TextDirection.ltr,
                         ),
                       ],
                     ),
@@ -230,9 +232,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               "is_general_page": isGeneral,
                               "topics": this._selectedTopicsList,
                             };
-                            String token = await WebApi().influencerSignup(data);
-                            influencer.setUserDat(data);
-                            influencer.setToken(token);
+                            Map response = await WebApi().influencerSignup(data);
+                            influencer.setUserData(data);
+                            influencer.setUserId(response["id"]);
+                            influencer.setToken("jwt " + response["token"]);
                             influencer.registerUser();
                             Navigator.pushReplacementNamed(context, "/home");
                           } on DioError catch (e) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/web_api.dart';
 import '../../models/influencer_ad.dart';
@@ -11,12 +12,21 @@ class ApprovedAdList extends StatefulWidget {
 }
 
 class _ApprovedAdListState extends State<ApprovedAdList> {
-  final int _userId = 6;
+  int _userId = 0;
   bool _isLoading = true;
   List<InfluencerAd> _allSuggestedAdsList = [];
   List<InfluencerAd> _approvedAdsList = [];
 
+  setUserId() async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    _userId = _prefs.getInt("id")!;
+  }
+
   getAds() async {
+    if (_userId == 0) {
+      await this.setUserId();
+    }
+
     setState(() {
       _isLoading = true;
     });
@@ -35,7 +45,7 @@ class _ApprovedAdListState extends State<ApprovedAdList> {
 
   @override
   void initState() {
-    getAds();
+    this.getAds();
     super.initState();
   }
 
@@ -46,7 +56,7 @@ class _ApprovedAdListState extends State<ApprovedAdList> {
             child: CircularProgressIndicator(),
           )
         : _approvedAdsList.isEmpty
-            ? Text("No Approved Ads")
+            ? Text("No Approved Ads", style: TextStyle(fontSize: 24))
             : Column(
                 children: List.generate(_approvedAdsList.length, (index) {
                   InfluencerAd _ad = _approvedAdsList[index];

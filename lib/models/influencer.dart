@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/topic.dart';
 
 class Influencer with ChangeNotifier {
+  late int _userId;
   late bool _isRegistered;
   late String _token;
   late String _email;
@@ -15,6 +16,8 @@ class Influencer with ChangeNotifier {
   late String _location;
   late bool _isGeneralPage;
   late List<Topic> _topicsList;
+
+  int get userId => _userId;
 
   bool get isRegistered => _isRegistered;
 
@@ -35,6 +38,7 @@ class Influencer with ChangeNotifier {
   Future<void> getUserDataSharedPref() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _isRegistered = prefs.getBool("is_registered")!;
+    _userId = prefs.getInt("id")!;
     _token = prefs.getString("token")!;
     _email = prefs.getString("email")!;
     _password = prefs.getString("password")!;
@@ -49,7 +53,8 @@ class Influencer with ChangeNotifier {
   Future<void> registerUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool("is_registered", true);
-    prefs.setString("token", token);
+    prefs.setInt("id", _userId);
+    prefs.setString("token", _token);
     prefs.setString("email", _email);
     prefs.setString("password", _password);
     prefs.setString("instagram_id", _instagramId);
@@ -61,7 +66,7 @@ class Influencer with ChangeNotifier {
     prefs.setString("topics_json", topicsJson);
   }
 
-  void setUserDat(Map data) {
+  void setUserData(Map data) {
     this._isRegistered = true;
     this._email = data['email'];
     this._password = data['password'];
@@ -76,6 +81,13 @@ class Influencer with ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _token = token;
     prefs.setString("token", _token);
+    notifyListeners();
+  }
+
+  Future<void> setUserId(int id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _userId = id;
+    prefs.setInt("id", _userId);
     notifyListeners();
   }
 }
