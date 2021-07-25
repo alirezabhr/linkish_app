@@ -18,6 +18,7 @@ class WebApi {
   late final String _influencerSuggestedAdUrl;
   late final String _confirmAdUrl;
   late final String _baseShortLink;
+  late final String _walletUrl;
 
   WebApi() {
     this._obtainTokenUrl = this._baseUrl + "obtain-token/";
@@ -28,6 +29,7 @@ class WebApi {
     this._influencerSuggestedAdUrl = this._baseUrl + "ad/inf/";
     this._confirmAdUrl = this._baseUrl + "ad/inf/";
     this._baseShortLink = this._baseUrl + "ad/ia/";
+    this._walletUrl = this._baseUrl + "ad/inf/wallet/";
   }
 
   Future<String> obtainToken() async {
@@ -159,4 +161,29 @@ class WebApi {
     };
     await dio.put(url, data: body);
   }
+
+  Future<List<InfluencerAd>> getWallet(int influencerPk) async {
+    Dio dio = Dio();
+    dio.options.headers["authorization"] = await getUserToken();
+    String url = this._walletUrl + influencerPk.toString() + "/";
+    Response response = await dio.get(url);
+
+    List<InfluencerAd> _walletList = List.generate(response.data.length, (index) {
+      Map adMap = response.data[index]["influencer_ad"]["suggested_ad"]["ad"];
+      Ad ad = Ad(adMap["title"], adMap["base_link"], adMap["is_video"], adMap["image"], []);
+      ad.id = adMap["id"];
+      ad.videoUrl = adMap["video"];
+
+      String _shortUrl = this._baseShortLink + response.data[index]["influencer_ad"]["short_link"];
+      int _clicks = response.data[index]["influencer_ad"]["clicks"];
+      String _approvedAt = response.data[index]["influencer_ad"]["approved_at"];
+
+      InfluencerAd influencerAd = InfluencerAd(_shortUrl, _clicks, _approvedAt, ad);
+      influencerAd.income = response.data[index]["income"];
+      return influencerAd;
+    });
+
+    return _walletList;
+  }
+
 }
