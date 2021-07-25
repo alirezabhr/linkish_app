@@ -30,3 +30,15 @@ Future<String?> getUserToken() async {
   String? token = _prefs.getString("token");
   return token;
 }
+
+Future<String?> getUserEmail() async {
+  SharedPreferences _prefs = await SharedPreferences.getInstance();
+  String? email = _prefs.getString("email");
+  return email;
+}
+
+Future<String?> getUserPassword() async {
+  SharedPreferences _prefs = await SharedPreferences.getInstance();
+  String? password = _prefs.getString("password");
+  return password;
+}

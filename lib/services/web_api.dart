@@ -10,6 +10,7 @@ import '../models/influencer_ad.dart';
 class WebApi {
   static final String baseUrl = "http://192.168.1.9:8000";
   final String _baseUrl = "http://192.168.1.9:8000/";
+  late final String _obtainTokenUrl;
   late final String _emailUrl;
   late final String _otpUrl;
   late final String _topicsUrl;
@@ -19,6 +20,7 @@ class WebApi {
   late final String _baseShortLink;
 
   WebApi() {
+    this._obtainTokenUrl = this._baseUrl + "obtain-token/";
     this._emailUrl = this._baseUrl + "send-email/";
     this._otpUrl = this._baseUrl + "check-otp/";
     this._topicsUrl = this._baseUrl + "topic/";
@@ -26,6 +28,19 @@ class WebApi {
     this._influencerSuggestedAdUrl = this._baseUrl + "ad/inf/";
     this._confirmAdUrl = this._baseUrl + "ad/inf/";
     this._baseShortLink = this._baseUrl + "ad/ia/";
+  }
+
+  Future<String> obtainToken() async {
+    String? email = await getUserEmail();
+    String? password = await getUserPassword();
+    Map data = {
+      "email": email,
+      "password": password,
+    };
+
+    Response response = await Dio().post(this._obtainTokenUrl, data: data);
+    String newToken = "jwt " + response.data["token"];
+    return newToken;
   }
 
   Future<void> sendEmail(String email) async {
@@ -119,11 +134,7 @@ class WebApi {
     Map<String, dynamic> body = {
       "suggested_ad": suggestionId,
     };
-    try {
-      await dio.post(url, data: body);
-    } on DioError catch (e) {
-      print(e.response);
-    }
+    await dio.post(url, data: body);
   }
 
   Future<void> rejectAd(int influencerPk, int suggestionId) async {
@@ -134,11 +145,7 @@ class WebApi {
       "suggested_ad": suggestionId,
       "is_rejected": true,
     };
-    try {
-      await dio.put(url, data: body);
-    } on DioError catch (e) {
-      print(e.response);
-    }
+    await dio.put(url, data: body);
   }
 
   Future<void> reportAd(int influencerPk, int suggestionId, String reportMsg) async {
@@ -150,10 +157,6 @@ class WebApi {
       "is_reported": true,
       "report_msg": reportMsg,
     };
-    try {
-      await dio.put(url, data: body);
-    } on DioError catch (e) {
-      print(e.response);
-    }
+    await dio.put(url, data: body);
   }
 }
