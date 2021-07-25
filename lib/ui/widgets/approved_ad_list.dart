@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/web_api.dart';
 import '../../models/influencer_ad.dart';
+import 'approved_ad_list_tile.dart';
 
 class ApprovedAdList extends StatefulWidget {
   const ApprovedAdList({Key? key}) : super(key: key);
@@ -30,7 +31,7 @@ class _ApprovedAdListState extends State<ApprovedAdList> {
     setState(() {
       _isLoading = true;
     });
-    List<InfluencerAd> _list = await WebApi().getApprovedAds(_userId);
+    List<InfluencerAd> _list = await WebApi().getWallet(_userId);
     setState(() {
       this._allSuggestedAdsList = _list;
       this._approvedAdsList = [];
@@ -62,13 +63,7 @@ class _ApprovedAdListState extends State<ApprovedAdList> {
                   InfluencerAd _ad = _approvedAdsList[index];
                   return Column(
                     children: [
-                      ListTile(
-                        title: Text(_ad.ad.title),
-                        trailing: Text(_ad.approvedAt.substring(0, 19)),
-                        subtitle: Text("clicks: ${_ad.clicks}"),
-                        onTap: () {
-                        },
-                      ),
+                      ApprovedAdListTile(_ad),
                       Divider(thickness: 1.5),
                     ],
                   );
