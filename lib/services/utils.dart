@@ -44,3 +44,9 @@ Future<String?> getUserPassword() async {
   String? password = _prefs.getString("password");
   return password;
 }
+
+String getNextDay(String today) {
+  int day = int.parse(today.substring(8, 10));
+  day += 1;
+  return today.substring(0,8) + day.toString() + today.substring(10);
+}
