@@ -22,7 +22,9 @@ String calculateRemainTime(String timeStr) {
   DateTime now = DateTime.now();
   Duration diff = time.difference(now);
 
-  return "${diff.inHours}:${diff.inMinutes - (diff.inHours*60)}";
+  final String hour = diff.inHours.toString().padLeft(2, '0');
+  final String minute = (diff.inMinutes - (diff.inHours*60)).toString().padLeft(2, '0');
+  return "$hour:$minute";
 }
 
 Future<String?> getUserToken() async {
