@@ -45,6 +45,19 @@ Future<String?> getUserPassword() async {
   return password;
 }
 
+String getCurrentDateTime() {
+  DateTime now = DateTime.now();
+  String currentDateTime = "";
+  currentDateTime += now.toString().substring(0, 4);
+  currentDateTime += now.toString().substring(5, 7);
+  currentDateTime += now.toString().substring(8, 10);
+  currentDateTime += "_";
+  currentDateTime += now.toString().substring(11, 13);
+  currentDateTime += now.toString().substring(14, 16);
+  currentDateTime += now.toString().substring(17, 19);
+  return currentDateTime;
+}
+
 String getNextDay(String today) {
   int day = int.parse(today.substring(8, 10));
   day += 1;

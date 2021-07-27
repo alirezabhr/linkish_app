@@ -9,7 +9,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../../models/influencer_ad.dart';
 import '../../services/web_api.dart';
-import '../../services/utils.dart';
+import '../../services/utils.dart' as utils;
 
 class AdDetail extends StatefulWidget {
   final InfluencerAd influencerAd;
@@ -25,7 +25,7 @@ class _AdDetailState extends State<AdDetail> {
   bool _isDownloading = false;
   bool _isDownloaded = false;
 
-  Future<bool> saveVideo(String url, String fileName) async {
+  Future<bool> saveMedia(String url, String fileName) async {
     Directory directory;
     try {
       if (Platform.isAndroid) {
@@ -92,13 +92,15 @@ class _AdDetailState extends State<AdDetail> {
     return false;
   }
 
-  downloadFile(String mediaPathName) async {
+  downloadFile(String mediaPathName, bool isVideo) async {
     setState(() {
       _isDownloading = true;
       progress = 0;
     });
 
-    bool downloaded = await saveVideo(mediaPathName, "new_video.mp4");
+    String newMediaName = utils.getCurrentDateTime();
+    String format = isVideo ? ".mp4" : ".jpg";
+    bool downloaded = await saveMedia(mediaPathName, newMediaName+format);
 
     if (downloaded) {
       setState(() {
@@ -124,7 +126,7 @@ class _AdDetailState extends State<AdDetail> {
   @override
   Widget build(BuildContext context) {
     final String remainingTime =
-        calculateRemainTime(this.widget.influencerAd.approvedAt);
+      utils.calculateRemainTime(this.widget.influencerAd.approvedAt);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -186,7 +188,7 @@ class _AdDetailState extends State<AdDetail> {
                         ? widget.influencerAd.ad.videoUrl
                         : widget.influencerAd.ad.imageUrl;
                     mediaUrl = WebApi.baseUrl + mediaUrl;
-                    await downloadFile(mediaUrl);
+                    await downloadFile(mediaUrl, widget.influencerAd.ad.isVideo);
                   },
                   label: Text("دانلود"),
                 ),
