@@ -23,7 +23,8 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Linkish',
         theme: ThemeData(
-        primarySwatch: Colors.deepOrange,
+          primarySwatch: Colors.deepOrange,
+          fontFamily: 'SamimFD',
         ),
         builder: (context, child) {
           return Directionality(
