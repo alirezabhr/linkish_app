@@ -19,7 +19,8 @@ class WebApi {
   late final String _confirmAdUrl;
   late final String _baseShortLink;
   late final String _walletUrl;
-  late final String _updateAccount;
+  late final String _updateAccountUrl;
+  late final String _changePasswordUrl;
 
   WebApi() {
     this._obtainTokenUrl = this._baseUrl + "obtain-token/";
@@ -31,7 +32,8 @@ class WebApi {
     this._confirmAdUrl = this._baseUrl + "ad/inf/";
     this._baseShortLink = this._baseUrl + "ad/ia/";
     this._walletUrl = this._baseUrl + "ad/inf/wallet/";
-    this._updateAccount = this._baseUrl + "influencer/";
+    this._updateAccountUrl = this._baseUrl + "influencer/";
+    this._changePasswordUrl = this._baseUrl + "change-pass/";
   }
 
   Future<String> obtainToken() async {
@@ -206,7 +208,7 @@ class WebApi {
 
   Future<void> setBankAccount(int userId, String cardNo,
       String accountNo) async {
-    final String url = this._updateAccount + userId.toString() + "/";
+    final String url = this._updateAccountUrl + userId.toString() + "/";
     Map body = {
       "pk": userId,
       "card_number": cardNo,
@@ -218,7 +220,7 @@ class WebApi {
   }
 
   Future<Map> getBankAccount(int userId) async {
-    final String url = this._updateAccount + userId.toString() + "/";
+    final String url = this._updateAccountUrl + userId.toString() + "/";
     Dio dio = Dio();
     dio.options.headers["authorization"] = await getUserToken();
     Response response = await dio.get(url);
@@ -239,5 +241,18 @@ class WebApi {
     };
 
     return data;
+  }
+  
+  Future<void> setNewPassword(int userId, String currentPass, String newPass) async {
+    final String url = this._changePasswordUrl + userId.toString() + "/";
+    Dio dio = Dio();
+    dio.options.headers["authorization"] = await getUserToken();
+
+    Map data = {
+      "current_pass": currentPass,
+      "new_pass": newPass,
+    };
+
+    await dio.put(url, data: data);
   }
 }

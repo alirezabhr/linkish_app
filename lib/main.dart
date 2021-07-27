@@ -9,6 +9,7 @@ import 'ui/screens/verification_screen.dart';
 import 'ui/screens/registration_screen.dart';
 import 'ui/screens/home_screen.dart';
 import 'ui/screens/bank_account_screen.dart';
+import 'ui/screens/password_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -38,6 +39,7 @@ class MyApp extends StatelessWidget {
           '/registration': (ctx) => RegistrationScreen(),
           '/home': (ctx) => HomePage(),
           '/bank-account': (ctx) => BankAccountScreen(),
+          '/password': (ctx) => PassWordScreen(),
         },
       ),
     );
