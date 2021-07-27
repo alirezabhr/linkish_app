@@ -13,8 +13,6 @@ class _EmailScreenState extends State<EmailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
-
     return Scaffold(
       appBar: AppBar(
         title: Text("ثبت نام لینکیش"),
@@ -24,6 +22,7 @@ class _EmailScreenState extends State<EmailScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            SizedBox(height: 50,),
             Padding(
               padding:
               const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
@@ -66,7 +65,7 @@ class _EmailScreenState extends State<EmailScreen> {
                 ),
               ],
             ),
-            SizedBox(height: height * 0.2),
+            Expanded(child: SizedBox()),
           ],
         ),
       ),

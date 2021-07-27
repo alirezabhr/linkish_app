@@ -1,10 +1,13 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/ReportDialog.dart';
 import '../widgets/ad_detail.dart';
 
+import '../../models/influencer.dart';
 import '../../models/suggested_ad.dart';
 import '../../models/influencer_ad.dart';
 import '../../services/web_api.dart';
@@ -16,6 +19,8 @@ class AdRow extends StatefulWidget {
 }
 
 class _AdRowState extends State<AdRow> {
+  late final Influencer _influencer;
+  bool flag = false;
   int _userId = 0;
   bool _isLoading = true;
   bool _hasActiveAd = false;
@@ -41,8 +46,21 @@ class _AdRowState extends State<AdRow> {
       _hasActiveAd = false;
       _isLoading = true;
     });
-    List<InfluencerAd> _list1 = await WebApi().getApprovedAds(_userId);
-    List<SuggestedAd> _list2 = await WebApi().getSuggestedAds(_userId);
+
+    List<InfluencerAd> _list1 = [];
+    List<SuggestedAd> _list2 = [];
+    try {
+      _list1 = await WebApi().getApprovedAds(_userId);
+      _list2 = await WebApi().getSuggestedAds(_userId);
+    } on DioError catch(e) {
+      if(e.response!.statusCode == 401) {
+        String _newToken = await WebApi().obtainToken();
+        _influencer.setToken(_newToken);
+        _list1 = await WebApi().getApprovedAds(_userId);
+        _list2 = await WebApi().getSuggestedAds(_userId);
+      }
+    }
+
     setState(() {
       if (_list1.isNotEmpty) {
         _activeAd = _list1.last;
@@ -103,6 +121,10 @@ class _AdRowState extends State<AdRow> {
 
   @override
   Widget build(BuildContext context) {
+    if (flag==false) {
+      _influencer = Provider.of<Influencer>(context);
+      flag = true;
+    }
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     final ButtonStyle buttonStyle =
@@ -114,10 +136,12 @@ class _AdRowState extends State<AdRow> {
           : _hasActiveAd ? AdDetail(this._activeAd)
           : _suggestedAdsList.isEmpty
               ? Center(
-                  child: Text(
-                  "هیچ تبلیغی پیشنهاد نشده است",
-                  style: TextStyle(fontSize: 24),
-                ))
+                  child: FittedBox(
+                    child: Text(
+                    "هیچ تبلیغی پیشنهاد نشده است",
+                    style: TextStyle(fontSize: 22),
+                ),
+                  ))
               : Column(
                   children: [
                     Padding(

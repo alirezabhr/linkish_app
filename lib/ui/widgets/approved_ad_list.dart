@@ -1,9 +1,13 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'approved_ad_list_tile.dart';
 
 import '../../services/web_api.dart';
 import '../../models/influencer_ad.dart';
-import 'approved_ad_list_tile.dart';
+import '../../models/influencer.dart';
 
 class ApprovedAdList extends StatefulWidget {
   const ApprovedAdList({Key? key}) : super(key: key);
@@ -13,6 +17,8 @@ class ApprovedAdList extends StatefulWidget {
 }
 
 class _ApprovedAdListState extends State<ApprovedAdList> {
+  late final Influencer _influencer;
+  bool flag = false;
   int _userId = 0;
   bool _isLoading = true;
   List<InfluencerAd> _allSuggestedAdsList = [];
@@ -31,7 +37,16 @@ class _ApprovedAdListState extends State<ApprovedAdList> {
     setState(() {
       _isLoading = true;
     });
-    List<InfluencerAd> _list = await WebApi().getWallet(_userId);
+    List<InfluencerAd> _list = [];
+    try {
+      _list = await WebApi().getWallet(_userId);
+    } on DioError catch (e) {
+      if (e.response!.statusCode == 401) {
+        String _newToken = await WebApi().obtainToken();
+        _influencer.setToken(_newToken);
+        _list = await WebApi().getWallet(_userId);
+      }
+    }
     setState(() {
       this._allSuggestedAdsList = _list;
       this._approvedAdsList = [];
@@ -52,12 +67,16 @@ class _ApprovedAdListState extends State<ApprovedAdList> {
 
   @override
   Widget build(BuildContext context) {
+    if (flag==false) {
+      _influencer = Provider.of<Influencer>(context);
+      flag = true;
+    }
     return _isLoading
         ? Center(
             child: CircularProgressIndicator(),
           )
         : _approvedAdsList.isEmpty
-            ? Text("هیچ تبلیغ پذیرفته شده ای ندارید", style: TextStyle(fontSize: 24))
+            ? FittedBox(child: Text("هیچ تبلیغ پذیرفته شده ای ندارید", style: TextStyle(fontSize: 22)))
             : Column(
                 children: List.generate(_approvedAdsList.length, (index) {
                   InfluencerAd _ad = _approvedAdsList[index];

@@ -1,7 +1,8 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter_insta/flutter_insta.dart';
 
 import '../widgets/TopicSelector.dart';
 import '../../models/topic.dart';
@@ -23,6 +24,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _igIdController = TextEditingController();
   final _locationController = TextEditingController();
   InstagramPageType? _pageType = InstagramPageType.general;
+  bool _isLoading = false;
 
   List<Topic> _topicsList = [];
   List<Topic> _selectedTopicsList = [];
@@ -34,6 +36,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       this._topicsList.sort((a, b) => a.title.compareTo(b.title));
     });
   }
+
   void removeItem(Topic value) {
     setState(() {
       this._topicsList.add(value);
@@ -46,6 +49,27 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     List<Topic> topicsList = await WebApi().getTopicsList();
     this._topicsList = topicsList;
     this._topicsList.sort((a, b) => a.title.compareTo(b.title));
+  }
+
+  Future<bool> isValidPage(String instagramId) async {
+
+    try {
+      FlutterInsta flutterInsta = new FlutterInsta();
+      await flutterInsta.getProfileData(instagramId);
+      int followers = int.parse(flutterInsta.followers!);
+      if (followers < 10000) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("تعداد فالوئر شما کمتر از 10هزار نفر است")),
+        );
+        return false;
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("آیدی اینستاگرام نامعتبر است")),
+      );
+      return false;
+    }
+    return true;
   }
 
   @override
@@ -115,8 +139,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       labelText: 'رمزعبور',
                       prefixIcon: IconButton(
                         icon: _obscurePassword
-                            ? Icon(Icons.visibility)
-                            : Icon(Icons.visibility_off),
+                            ? Icon(Icons.visibility_off)
+                            : Icon(Icons.visibility),
                         onPressed: () {
                           setState(() {
                             _obscurePassword = !_obscurePassword;
@@ -210,7 +234,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   padding: const EdgeInsets.symmetric(
                       vertical: 2.0, horizontal: 16.0),
                   child: _pageType == InstagramPageType.pro
-                      ? TopicSelector(this._topicsList, this._selectedTopicsList, this.appendItem, this.removeItem)
+                      ? TopicSelector(
+                          this._topicsList,
+                          this._selectedTopicsList,
+                          this.appendItem,
+                          this.removeItem)
                       : null,
                 ),
                 Row(
@@ -219,34 +247,45 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     ElevatedButton(
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
-                          bool isGeneral =
-                              _pageType == InstagramPageType.general
-                                  ? true
-                                  : false;
-                          try {
-                            Map data = {
-                              "email": emailAddress,
-                              "password": _passwordController.text,
-                              "instagram_id": _igIdController.text,
-                              "location": _locationController.text,
-                              "is_general_page": isGeneral,
-                              "topics": this._selectedTopicsList,
-                            };
-                            Map response = await WebApi().influencerSignup(data);
-                            influencer.setUserData(data);
-                            influencer.setUserId(response["id"]);
-                            influencer.setToken("jwt " + response["token"]);
-                            influencer.registerUser();
-                            Navigator.pushReplacementNamed(context, "/home");
-                          } on DioError catch (e) {
-                            print(e.response!.data); // todo should add a validation, show the exception
+                          setState(() {
+                            _isLoading = true;
+                          });
+
+                          bool isValidInstagram = await isValidPage(_igIdController.text);
+                          print("is valid page: $isValidInstagram");
+                          if (isValidInstagram) {
+                            bool isGeneral = _pageType == InstagramPageType.general ? true : false;
+                            try {
+                              Map data = {
+                                "email": emailAddress,
+                                "password": _passwordController.text,
+                                "instagram_id": _igIdController.text,
+                                "location": _locationController.text,
+                                "is_general_page": isGeneral,
+                                "topics": this._selectedTopicsList,
+                              };
+                              Map response = await WebApi().influencerSignup(data);
+                              influencer.setUserData(data);
+                              influencer.setUserId(response["id"]);
+                              influencer.setToken("jwt " + response["token"]);
+                              influencer.registerUser();
+                              Navigator.pushReplacementNamed(context, "/home");
+                            } on DioError catch (e) {
+                              print(e.response!.data); // todo should add a validation, show the exception
+                            }
                           }
+
+                          setState(() {
+                            _isLoading = false;
+                          });
                         }
                       },
-                      child: Text(
-                        "ثبت نام",
-                        style: TextStyle(fontSize: 16),
-                      ),
+                      child: _isLoading
+                          ? CircularProgressIndicator()
+                          : Text(
+                              "ثبت نام",
+                              style: TextStyle(fontSize: 16),
+                            ),
                     ),
                   ],
                 ),

@@ -16,7 +16,6 @@ class _VerificationScreenState extends State<VerificationScreen> {
   @override
   Widget build(BuildContext context) {
     final String emailAddress = ModalRoute.of(context)!.settings.arguments as String;
-    final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
       appBar: AppBar(title: Text("ثبت نام لینکیش"),),
@@ -27,6 +26,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              SizedBox(height: 50),
               Padding(
                 padding:
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
@@ -79,7 +79,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     onPressed: ()async {
                       if (_formKey.currentState!.validate()) {
                         try {
-                          // await WebApi().checkOtp(emailAddress, _otpController.text);
+                          await WebApi().checkOtp(emailAddress, _otpController.text);
                           Navigator.pushReplacementNamed(context, "/registration", arguments: emailAddress);
                         } on DioError catch (exception) {
                           print(exception);   // todo should add a validation, show the exception
@@ -93,7 +93,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: height * 0.2),
+              Expanded(child: SizedBox()),
             ],
           ),
         ),

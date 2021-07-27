@@ -43,39 +43,41 @@ class _InstaDetailsState extends State<InstaDetails> {
           ? Center(
               child: CircularProgressIndicator(),
             )
-          : Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(50),
-                  child: Image.network(
-                    _imageUrl,
-                    height: 100,
+          : FittedBox(
+            child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(50),
+                    child: Image.network(
+                      _imageUrl,
+                      height: 100,
+                    ),
                   ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.instagramId,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.instagramId,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 10,),
-                      Text(
-                        "تعداد فالوئر: $_followers",
-                        style: TextStyle(fontSize: 15),
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
+                        SizedBox(height: 10,),
+                        Text(
+                          "تعداد فالوئر: $_followers",
+                          style: TextStyle(fontSize: 15),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+          ),
     );
   }
 }
