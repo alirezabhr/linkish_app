@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:linkish/models/influencer_ad.dart';
+
+import '../../models/influencer_ad.dart';
+import '../../services/utils.dart';
 
 class WalletReport extends StatelessWidget {
   final InfluencerAd influencerAd;
@@ -21,7 +23,7 @@ class WalletReport extends StatelessWidget {
             "earning: ${influencerAd.income}",
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          subtitle: Text(influencerAd.approvedAt.substring(0, 19)),
+          subtitle: Text(getNextDay(influencerAd.approvedAt.substring(0, 19))),
         ),
         Divider(thickness: 1.5),
       ],
