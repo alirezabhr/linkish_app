@@ -21,6 +21,7 @@ class WebApi {
   late final String _walletUrl;
   late final String _updateAccountUrl;
   late final String _changePasswordUrl;
+  late final String _withdraw;
 
   WebApi() {
     this._obtainTokenUrl = this._baseUrl + "obtain-token/";
@@ -34,6 +35,7 @@ class WebApi {
     this._walletUrl = this._baseUrl + "ad/inf/wallet/";
     this._updateAccountUrl = this._baseUrl + "influencer/";
     this._changePasswordUrl = this._baseUrl + "change-pass/";
+    this._withdraw = this._baseUrl + "withdraw/";
   }
 
   Future<String> obtainToken() async {
@@ -242,7 +244,7 @@ class WebApi {
 
     return data;
   }
-  
+
   Future<void> setNewPassword(int userId, String currentPass, String newPass) async {
     final String url = this._changePasswordUrl + userId.toString() + "/";
     Dio dio = Dio();
@@ -254,5 +256,16 @@ class WebApi {
     };
 
     await dio.put(url, data: data);
+  }
+
+  Future<void> withdraw(int userId, int amount) async {
+    final String url = this._withdraw + userId.toString() + "/";
+    Dio dio = Dio();
+    dio.options.headers["authorization"] = await getUserToken();
+
+    Map data = {
+      "amount": amount,
+    };
+    await dio.post(url, data: data);
   }
 }

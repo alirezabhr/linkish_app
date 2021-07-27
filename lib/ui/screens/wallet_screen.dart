@@ -1,4 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:linkish/models/influencer.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../models/influencer_ad.dart';
@@ -13,6 +16,8 @@ class WalletScreen extends StatefulWidget {
 }
 
 class _WalletScreenState extends State<WalletScreen> {
+  late final Influencer _influencer;
+  bool flag = false;
   bool _isLoading = true;
   List<InfluencerAd> _walletList = [];
   int _totalIncome = 0;
@@ -33,6 +38,25 @@ class _WalletScreenState extends State<WalletScreen> {
     });
   }
 
+  withdraw(int amount) async {
+    if (amount < 100000) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("حداقل مبلغ قابل برداشت: 100هزار تومان")),
+      );
+    } else {
+      try {
+        await WebApi().withdraw(_influencer.userId, amount);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("درخواست شما با موفقیت ثبت شد.")),
+        );
+      } on DioError {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("در حال حاضر قادر به برداشت وجه نیستید. لظفا بعدا تلاش کنید.")),
+        );
+      }
+    }
+  }
+
   @override
   void initState() {
     getWallet();
@@ -41,6 +65,10 @@ class _WalletScreenState extends State<WalletScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (flag == false) {
+      _influencer = Provider.of<Influencer>(context);
+      flag = true;
+    }
     final height = MediaQuery.of(context).size.height;
 
     return Container(
@@ -103,7 +131,9 @@ class _WalletScreenState extends State<WalletScreen> {
                   Container(
                     child: ElevatedButton.icon(
                       icon: Icon(Icons.arrow_circle_up),
-                      onPressed: () {},
+                      onPressed: () async {
+                        await withdraw(_totalIncome);
+                      },
                       label: Text("برداشت از کیف"),
                     ),
                   )
