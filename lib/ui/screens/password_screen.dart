@@ -122,7 +122,8 @@ class _PassWordScreenState extends State<PassWordScreen> {
                     if (_formKey.currentState!.validate()) {
                       String currentPass = _currentPasswordController.text;
                       String newPass = _newPasswordController.text;
-                      setNewPassword(userId, currentPass, newPass);
+                      await setNewPassword(userId, currentPass, newPass);
+                      influencer.setNewPass(newPass);
                     }
                   },
                   child: Row(

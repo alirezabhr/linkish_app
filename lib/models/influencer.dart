@@ -90,4 +90,11 @@ class Influencer with ChangeNotifier {
     prefs.setInt("id", _userId);
     notifyListeners();
   }
+
+  Future<void> setNewPass(String password) async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    this._password = password;
+    _prefs.setString("password", password);
+    notifyListeners();
+  }
 }
