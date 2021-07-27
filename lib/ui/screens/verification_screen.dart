@@ -82,6 +82,11 @@ class _VerificationScreenState extends State<VerificationScreen> {
                           await WebApi().checkOtp(emailAddress, _otpController.text);
                           Navigator.pushReplacementNamed(context, "/registration", arguments: emailAddress);
                         } on DioError catch (exception) {
+                          if (exception.response!.statusCode == 400) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("رمز یکبار مصرف اشتباه است")),
+                            );
+                          }
                           print(exception);   // todo should add a validation, show the exception
                         }
                       }
