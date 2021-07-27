@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Linkish"),
+        title: Text("لینکیش"),
         actions: [
           IconButton(onPressed: () {}, icon: Icon(Icons.notifications_sharp)),
         ],
@@ -40,19 +40,19 @@ class _HomePageState extends State<HomePage> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home_rounded, color: Colors.orange),
-            label: 'Home',
+            label: 'خانه',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.check_circle_outline, color: Colors.orange),
-            label: 'Approved Ads',
+            label: 'کمپین ها',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_balance_wallet_outlined, color: Colors.orange),
-            label: 'Wallet',
+            label: 'کیف پول',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person, color: Colors.orange),
-            label: 'Profile',
+            label: 'پروفایل',
           ),
         ],
         currentIndex: _selectedIndex,

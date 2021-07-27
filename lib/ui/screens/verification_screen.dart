@@ -19,7 +19,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
     final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      appBar: AppBar(title: Text("Verification"),),
+      appBar: AppBar(title: Text("ثبت نام لینکیش"),),
       body: Form(
         key: _formKey,
         child: Container(
@@ -31,7 +31,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                 padding:
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
                 child: Text(
-                  "Enter You OTP:",
+                  "کد یکبار مصرف ایمیل شده را وارد نمایید:",
                   style: TextStyle(fontSize: 18),
                   textAlign: TextAlign.right,
                 ),
@@ -57,14 +57,16 @@ class _VerificationScreenState extends State<VerificationScreen> {
                   controller: _otpController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: 'OTP',
+                    labelText: 'کد',
+                    hintText: 'کد یکبار مصرف',
                   ),
                   keyboardType: TextInputType.number,
                   textDirection: TextDirection.ltr,
                   textAlign: TextAlign.center,
+                  maxLength: 5,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter some text';
+                      return 'فیلد خالی است';
                     }
                     return null;
                   },
@@ -85,7 +87,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                       }
                     },
                     child: Text(
-                      "Continue",
+                      "ادامه",
                       style: TextStyle(fontSize: 16),
                     ),
                   ),

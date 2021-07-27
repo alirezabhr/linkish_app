@@ -17,7 +17,7 @@ class _EmailScreenState extends State<EmailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Email"),
+        title: Text("ثبت نام لینکیش"),
       ),
       body: Container(
         child: Column(
@@ -28,7 +28,7 @@ class _EmailScreenState extends State<EmailScreen> {
               padding:
               const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
               child: Text(
-                "Enter You Email:",
+                "ایمیل خود را وارد نمایید:",
                 style: TextStyle(fontSize: 18),
                 textAlign: TextAlign.right,
               ),
@@ -40,7 +40,7 @@ class _EmailScreenState extends State<EmailScreen> {
                 controller: _emailController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: 'Email',
+                  labelText: 'ایمیل',
                 ),
                 keyboardType: TextInputType.emailAddress,
                 textAlign: TextAlign.center,
@@ -60,7 +60,7 @@ class _EmailScreenState extends State<EmailScreen> {
                     }
                   },
                   child: Text(
-                    "Continue",
+                    "ادامه",
                     style: TextStyle(fontSize: 16),
                   ),
                 ),

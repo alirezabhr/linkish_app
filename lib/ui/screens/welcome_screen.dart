@@ -119,7 +119,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                   padding: EdgeInsets.all(8),
                   child: Text(
                     'لینکیش',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
                 ),

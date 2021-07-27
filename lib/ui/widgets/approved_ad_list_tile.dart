@@ -21,7 +21,7 @@ class _ApprovedAdListTileState extends State<ApprovedAdListTile> {
         ? Container(
             child: ListTile(
               title: Text(widget.influencerAd.ad.title),
-              trailing: Text("clicks: ${widget.influencerAd.clicks}"),
+              trailing: Text("کلیک ها: ${widget.influencerAd.clicks}"),
               subtitle: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Column(
@@ -60,7 +60,7 @@ class _ApprovedAdListTileState extends State<ApprovedAdListTile> {
         : Container(
             child: ListTile(
               title: Text(widget.influencerAd.ad.title),
-              trailing: Text("clicks: ${widget.influencerAd.clicks}"),
+              trailing: Text("کلیک ها: ${widget.influencerAd.clicks}"),
               subtitle: Text(widget.influencerAd.approvedAt.substring(0, 19)),
               onTap: () {
                 setState(() {

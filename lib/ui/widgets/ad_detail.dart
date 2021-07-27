@@ -21,7 +21,6 @@ class AdDetail extends StatefulWidget {
 }
 
 class _AdDetailState extends State<AdDetail> {
-  final String filename = 'sooriland_video.mp4';
   double progress = 0;
   bool _isDownloading = false;
   bool _isDownloaded = false;
@@ -117,7 +116,7 @@ class _AdDetailState extends State<AdDetail> {
     
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Copied to clipboard'),
+        content: Text('لینک کپی شد'),
       ),
     );
   }
@@ -163,7 +162,7 @@ class _AdDetailState extends State<AdDetail> {
                   onPressed: () async {
                     await _copyToClipboard(widget.influencerAd.shortLink);
                   },
-                  label: Text("copy"),
+                  label: Text("کپی"),
                 ),
               ],
             ),
@@ -176,7 +175,7 @@ class _AdDetailState extends State<AdDetail> {
                   padding: const EdgeInsets.symmetric(
                       vertical: 12.0, horizontal: 8.0),
                   child: Text(
-                    "media type: ${widget.influencerAd.ad.isVideo ? "video" : "image"}",
+                    "نوع محتوا: ${widget.influencerAd.ad.isVideo ? "ویدئو" : "عکس"}",
                     style: TextStyle(fontSize: 16),
                   ),
                 ),
@@ -189,20 +188,20 @@ class _AdDetailState extends State<AdDetail> {
                     mediaUrl = WebApi.baseUrl + mediaUrl;
                     await downloadFile(mediaUrl);
                   },
-                  label: Text("download"),
+                  label: Text("دانلود"),
                 ),
               ],
             ),
           ),
           Text(_isDownloading
-              ? "progress: $progress%"
+              ? "دانلود شده: $progress%"
               : _isDownloaded
-                  ? "Successfully downloaded"
+                  ? "با موفقیت دانلود شد"
                   : ""),
           Container(
             padding: const EdgeInsets.all(16.0),
             child: Text(
-              "remaining: " + remainingTime,
+              "زمان باقی مانده کمپین: " + remainingTime,
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
           ),

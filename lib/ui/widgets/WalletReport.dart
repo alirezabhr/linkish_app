@@ -20,7 +20,7 @@ class WalletReport extends StatelessWidget {
           ),
           title: Text(influencerAd.ad.title),
           trailing: Text(
-            "earning: ${influencerAd.income}",
+            "درآمد: ${influencerAd.income}",
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           subtitle: Text(getNextDay(influencerAd.approvedAt.substring(0, 19))),

@@ -57,7 +57,7 @@ class _ApprovedAdListState extends State<ApprovedAdList> {
             child: CircularProgressIndicator(),
           )
         : _approvedAdsList.isEmpty
-            ? Text("No Approved Ads", style: TextStyle(fontSize: 24))
+            ? Text("هیچ تبلیغ پذیرفته شده ای ندارید", style: TextStyle(fontSize: 24))
             : Column(
                 children: List.generate(_approvedAdsList.length, (index) {
                   InfluencerAd _ad = _approvedAdsList[index];

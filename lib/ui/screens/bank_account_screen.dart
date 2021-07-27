@@ -73,7 +73,7 @@ class _BankAccountScreenState extends State<BankAccountScreen> {
     final Influencer influencer = Provider.of<Influencer>(context);
     final int userId = influencer.userId;
     return Scaffold(
-      appBar: AppBar(title: Text("Bank Account")),
+      appBar: AppBar(title: Text("تنظیمات حساب بانکی")),
       body: Container(
         padding: EdgeInsets.all(8.0),
         child: Form(
@@ -86,7 +86,7 @@ class _BankAccountScreenState extends State<BankAccountScreen> {
                   children: [
                     Row(
                       children: [
-                        Text("شماره کارت: "),
+                        Text("شماره کارت: ", style: TextStyle(fontSize: 16),),
                         Text(
                           _cardNo,
                           textDirection: TextDirection.ltr,
@@ -95,7 +95,7 @@ class _BankAccountScreenState extends State<BankAccountScreen> {
                     ),
                     Row(
                       children: [
-                        Text("شماره شبا: "),
+                        Text("شماره شبا: ", style: TextStyle(fontSize: 16),),
                         Text(
                           _accountNo,
                           textDirection: TextDirection.ltr,
@@ -111,7 +111,7 @@ class _BankAccountScreenState extends State<BankAccountScreen> {
                         controller: _cardNoController,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
-                          labelText: 'card number',
+                          labelText: 'شماره کارت',
                         ),
                         keyboardType: TextInputType.number,
                         textDirection: TextDirection.ltr,
@@ -119,13 +119,13 @@ class _BankAccountScreenState extends State<BankAccountScreen> {
                         maxLength: 16,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter some text';
+                            return 'فیلد شماره کارت خالی است';
                           }
                           if (value.length < 16) {
-                            return 'Not enough numbers';
+                            return 'تعداد ارقام شماره کارت کافی نیست';
                           }
                           if (!utils.isNumeric(value)) {
-                            return 'Card number is not valid';
+                            return 'شماره کارت نامعتبر است';
                           }
                           return null;
                         },
@@ -138,7 +138,7 @@ class _BankAccountScreenState extends State<BankAccountScreen> {
                         controller: _accountNoController,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
-                          labelText: 'account number',
+                          labelText: 'شماره شبا',
                         ),
                         keyboardType: TextInputType.number,
                         textDirection: TextDirection.ltr,
@@ -146,14 +146,14 @@ class _BankAccountScreenState extends State<BankAccountScreen> {
                         maxLength: 24,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter some text';
+                            return 'فیلد شماره حساب خالی است';
                           }
                           if (value.length < 24) {
-                            return 'Not enough numbers';
+                            return 'تعداد ارقام کافی نیست';
                           }
                           if (!utils.isNumeric(value)) {
                             print(utils.isNumeric(value));
-                            return 'Account number is not valid';
+                            return 'شماره حساب نامعتبر است';
                           }
                           return null;
                         },
@@ -179,7 +179,7 @@ class _BankAccountScreenState extends State<BankAccountScreen> {
                               child: _isSending
                                   ? CircularProgressIndicator()
                                   : Text(
-                                      "Register",
+                                      "ثبت",
                                       style: TextStyle(fontSize: 16),
                                     ),
                             ),

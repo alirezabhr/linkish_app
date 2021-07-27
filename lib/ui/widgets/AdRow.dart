@@ -115,7 +115,7 @@ class _AdRowState extends State<AdRow> {
           : _suggestedAdsList.isEmpty
               ? Center(
                   child: Text(
-                  "No Suggested Ads",
+                  "هیچ تبلیغی پیشنهاد نشده است",
                   style: TextStyle(fontSize: 24),
                 ))
               : Column(
@@ -169,7 +169,7 @@ class _AdRowState extends State<AdRow> {
                               await WebApi().confirmAd(this._userId, this._suggestedAd.id);
                               await getAds();
                             },
-                            child: Text("Confirm"),
+                            child: Text("تایید تبلیغ"),
                             style: buttonStyle,
                           ),
                           ElevatedButton(
@@ -178,21 +178,24 @@ class _AdRowState extends State<AdRow> {
                                     this._userId, this._suggestedAd.id);
                                 await getAds();
                               },
-                              child: Text("Reject"),
-                              style: buttonStyle),
-                          ElevatedButton(
-                              onPressed: () {
-                                showDialog<void>(
-                                    context: context,
-                                    builder: (context) => ReportDialog(
-                                        this._userId, this._suggestedAd.id));
-                                // todo callback function for refreshing
-                              },
-                              child: Text("Report"),
+                              child: Text("مرتبط نیست"),
                               style: buttonStyle),
                         ],
                       ),
-                    )
+                    ),
+                    Container(
+                      alignment: Alignment.center,
+                      child: ElevatedButton(
+                          onPressed: () {
+                            showDialog<void>(
+                                context: context,
+                                builder: (context) => ReportDialog(
+                                    this._userId, this._suggestedAd.id));
+                            // todo callback function for refreshing
+                          },
+                          child: Text("گزارش مشکل"),
+                          style: buttonStyle),
+                    ),
                   ],
                 ),
     );

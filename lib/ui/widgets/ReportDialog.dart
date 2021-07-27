@@ -4,11 +4,10 @@ import 'package:flutter/material.dart';
 import '../../services/web_api.dart';
 
 final List<String> _reportMessages = [
-  "Spam",
-  "Violence",
-  "Child Abuse",
-  "Pornography",
-  "Other"
+  "محتوای غیراخلاقی",
+  "محتوای سیاسی",
+  "مشکل در دانلود محتوا",
+  "سایر"
 ];
 
 class ReportDialog extends StatefulWidget {
@@ -31,7 +30,7 @@ class _ReportDialogState extends State<ReportDialog> {
     return Form(
       key: _formKey,
       child: AlertDialog(
-        title: Text('Report This Ad'),
+        title: Text('گزارش مشکل تبلیغ'),
         contentPadding: EdgeInsets.zero,
         content: Padding(
           padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
@@ -61,11 +60,12 @@ class _ReportDialogState extends State<ReportDialog> {
                         controller: _reportController,
                         decoration: InputDecoration(
                           border: UnderlineInputBorder(),
-                          labelText: 'Describe report',
+                          labelText: 'گزارش',
+                          hintText: 'توضیح گزارش',
                         ),
                         validator: (value) {
                           if (value!.isEmpty) {
-                            return 'enter your report message';
+                            return 'مشکل را شرح دهید';
                           }
                         },
                       )
@@ -88,7 +88,7 @@ class _ReportDialogState extends State<ReportDialog> {
                 Navigator.of(context).pop();
               }
             },
-            child: Text('REPORT'),
+            child: Text('ثبت گزارش'),
           ),
         ],
       ),

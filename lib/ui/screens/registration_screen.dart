@@ -60,7 +60,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     String emailAddress = ModalRoute.of(context)!.settings.arguments as String;
     return Scaffold(
       appBar: AppBar(
-        title: Text("Registration"),
+        title: Text("ثبت نام لینکیش"),
       ),
       body: Form(
         key: _formKey,
@@ -112,7 +112,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     controller: _passwordController,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
-                      labelText: 'Password',
+                      labelText: 'رمزعبور',
                       prefixIcon: IconButton(
                         icon: _obscurePassword
                             ? Icon(Icons.visibility)
@@ -128,10 +128,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     obscureText: this._obscurePassword,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
+                        return 'فیلد رمزعبور خالی است';
                       }
                       if (value.length < 8) {
-                        return 'Password should be at least 8 characters';
+                        return 'رمز عبور باید شامل حداقل 8 کاراکتر باشد';
                       }
                       return null;
                     },
@@ -144,12 +144,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     controller: _igIdController,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
-                      labelText: 'Instagram Id',
+                      labelText: 'آیدی اینستاگرام',
                     ),
                     textDirection: TextDirection.ltr,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
+                        return 'فیلد آیدی اینستاگرام خالی است';
                       }
                       return null;
                     },
@@ -162,18 +162,18 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     controller: _locationController,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
-                      labelText: 'Location',
+                      labelText: 'موقعیت مکانی',
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
+                        return 'فیلد خالی است';
                       }
                       return null;
                     },
                   ),
                 ),
                 ListTile(
-                  title: const Text('My Page Is General'),
+                  title: const Text('محتوای پیج من عمومی است'),
                   leading: Radio<InstagramPageType>(
                     value: InstagramPageType.general,
                     groupValue: _pageType,
@@ -190,7 +190,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   },
                 ),
                 ListTile(
-                  title: const Text('My Page Is Professional'),
+                  title: const Text('محتوای پیج من تخصصی است'),
                   leading: Radio<InstagramPageType>(
                     value: InstagramPageType.pro,
                     groupValue: _pageType,
@@ -244,7 +244,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         }
                       },
                       child: Text(
-                        "Register",
+                        "ثبت نام",
                         style: TextStyle(fontSize: 16),
                       ),
                     ),

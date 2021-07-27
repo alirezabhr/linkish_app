@@ -36,7 +36,7 @@ class _PassWordScreenState extends State<PassWordScreen> {
     final Influencer influencer = Provider.of<Influencer>(context);
     final int userId = influencer.userId;
     return Scaffold(
-      appBar: AppBar(title: Text("Change Password")),
+      appBar: AppBar(title: Text("تغییر رمز عبور")),
       body: Container(
         padding: EdgeInsets.all(8.0),
         child: Form(
@@ -52,16 +52,16 @@ class _PassWordScreenState extends State<PassWordScreen> {
                   controller: _currentPasswordController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: 'current password',
+                    hintText: 'رمز عبور فعلی',
                   ),
                   textDirection: TextDirection.ltr,
                   textAlign: TextAlign.center,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter some text';
+                      return 'رمز عبور خالی است';
                     }
                     if (value.length < 8) {
-                      return 'password should be at least 8 characters';
+                      return 'رمز عبور باید حداقل 8 کاراکتر باشد';
                     }
                     return null;
                   },
@@ -74,16 +74,16 @@ class _PassWordScreenState extends State<PassWordScreen> {
                   controller: _newPasswordController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: 'new password',
+                    hintText: 'رمز عبور جدید',
                   ),
                   textDirection: TextDirection.ltr,
                   textAlign: TextAlign.center,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter some text';
+                      return 'رمز عبور خالی است';
                     }
                     if (value.length < 8) {
-                      return 'password should be at least 8 characters';
+                      return 'رمز عبور باید حداقل 8 کاراکتر باشد';
                     }
                     return null;
                   },
@@ -96,19 +96,19 @@ class _PassWordScreenState extends State<PassWordScreen> {
                   controller: _confirmPasswordController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: 'confirm new password',
+                    hintText: 'تکرار رمز عبور',
                   ),
                   textDirection: TextDirection.ltr,
                   textAlign: TextAlign.center,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter some text';
+                      return 'رمز عبور خالی است';
                     }
                     if (value.length < 8) {
-                      return 'password should be at least 8 characters';
+                      return 'رمز عبور باید حداقل 8 کاراکتر باشد';
                     }
                     if (value != _newPasswordController.text) {
-                      return 'passwords are not the same';
+                      return 'پسوردها یکسان نیستند';
                     }
                     return null;
                   },
@@ -134,7 +134,7 @@ class _PassWordScreenState extends State<PassWordScreen> {
                         child: _isSending
                             ? CircularProgressIndicator()
                             : Text(
-                          "Register",
+                          "ثبت",
                           style: TextStyle(fontSize: 16),
                         ),
                       ),
