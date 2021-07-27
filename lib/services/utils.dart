@@ -50,3 +50,27 @@ String getNextDay(String today) {
   day += 1;
   return today.substring(0,8) + day.toString() + today.substring(10);
 }
+
+bool isNumeric(String number) {
+  for (int i=0; i<number.length; i++) {
+    try {
+      int.parse(number[i]);
+    } catch(e) {
+      return false;
+    }
+  }
+  return true;
+}
+
+String addDashCardNo(String cardNo) {
+  String newStr = "";
+
+  for(int i=4; i <= cardNo.length; i+=4) {
+    newStr += cardNo.substring(i-4, i);
+    if (i!=cardNo.length) {
+      newStr += ' - ';
+    }
+  }
+
+  return newStr;
+}
