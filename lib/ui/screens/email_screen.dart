@@ -52,30 +52,35 @@ class _EmailScreenState extends State<EmailScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton(
-                  onPressed: () async {
-                    setState(() {
-                      _isLoading = true;
-                    });
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.all(10),
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        setState(() {
+                          _isLoading = true;
+                        });
 
-                    try {
-                      await WebApi().sendEmail(_emailController.text);
-                      Navigator.pushReplacementNamed(context, "/verification",
-                          arguments: _emailController.text);
-                    } catch (exception) {
-                      print(
-                          exception); // todo should add a validation, show the exception
-                    }
-                    setState(() {
-                      _isLoading = false;
-                    });
-                  },
-                  child: _isLoading
-                      ? CircularProgressIndicator(color: Colors.white,)
-                      : Text(
-                          "ادامه",
-                          style: TextStyle(fontSize: 16),
-                        ),
+                        try {
+                          await WebApi().sendEmail(_emailController.text);
+                          Navigator.pushReplacementNamed(context, "/verification",
+                              arguments: _emailController.text);
+                        } catch (exception) {
+                          print(
+                              exception); // todo should add a validation, show the exception
+                        }
+                        setState(() {
+                          _isLoading = false;
+                        });
+                      },
+                      child: _isLoading
+                          ? CircularProgressIndicator(color: Colors.white,)
+                          : Text(
+                              "ادامه",
+                              style: TextStyle(fontSize: 16),
+                            ),
+                    ),
+                  ),
                 ),
               ],
             ),
