@@ -100,7 +100,7 @@ class _AdDetailState extends State<AdDetail> {
 
     String newMediaName = utils.getCurrentDateTime();
     String format = isVideo ? ".mp4" : ".jpg";
-    bool downloaded = await saveMedia(mediaPathName, newMediaName+format);
+    bool downloaded = await saveMedia(mediaPathName, newMediaName + format);
 
     if (downloaded) {
       setState(() {
@@ -115,7 +115,7 @@ class _AdDetailState extends State<AdDetail> {
 
   Future<void> _copyToClipboard(String text) async {
     await Clipboard.setData(ClipboardData(text: text));
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('لینک کپی شد'),
@@ -126,7 +126,7 @@ class _AdDetailState extends State<AdDetail> {
   @override
   Widget build(BuildContext context) {
     final String remainingTime =
-      utils.calculateRemainTime(this.widget.influencerAd.approvedAt);
+        utils.calculateRemainTime(this.widget.influencerAd.approvedAt);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -157,7 +157,10 @@ class _AdDetailState extends State<AdDetail> {
                     border: Border.all(),
                     borderRadius: BorderRadius.all(Radius.circular(5)),
                   ),
-                  child: Text(widget.influencerAd.shortLink),
+                  child: Text(
+                    widget.influencerAd.shortLink,
+                    style: TextStyle(fontFamily: 'Arial'),
+                  ),
                 ),
                 ElevatedButton.icon(
                   icon: Icon(Icons.copy),
@@ -188,7 +191,8 @@ class _AdDetailState extends State<AdDetail> {
                         ? widget.influencerAd.ad.videoUrl
                         : widget.influencerAd.ad.imageUrl;
                     mediaUrl = WebApi.baseUrl + mediaUrl;
-                    await downloadFile(mediaUrl, widget.influencerAd.ad.isVideo);
+                    await downloadFile(
+                        mediaUrl, widget.influencerAd.ad.isVideo);
                   },
                   label: Text("دانلود"),
                 ),
