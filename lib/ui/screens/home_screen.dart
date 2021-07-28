@@ -35,7 +35,7 @@ class _HomePageState extends State<HomePage> {
           IconButton(onPressed: () {}, icon: Icon(Icons.notifications_sharp)),
         ],
       ),
-      drawer: Drawer(),
+      // drawer: Drawer(),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
