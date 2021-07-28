@@ -13,7 +13,8 @@ class Influencer with ChangeNotifier {
   late String _email;
   late String _password;
   late String _instagramId;
-  late String _location;
+  late String _province;
+  late String _city;
   late bool _isGeneralPage;
   late List<Topic> _topicsList;
 
@@ -29,7 +30,9 @@ class Influencer with ChangeNotifier {
 
   String get instagramId => _instagramId;
 
-  String get location => _location;
+  String get province => _province;
+
+  String get city => _city;
 
   bool get isGeneralPage => _isGeneralPage;
 
@@ -43,7 +46,8 @@ class Influencer with ChangeNotifier {
     _email = prefs.getString("email")!;
     _password = prefs.getString("password")!;
     _instagramId = prefs.getString("instagram_id")!;
-    _location = prefs.getString("location")!;
+    _province = prefs.getString("province")!;
+    _city = prefs.getString("city")!;
     _isGeneralPage = prefs.getBool("is_general_page")!;
     String? topicsJson = prefs.getString("topics_json");
     List topicsMap = jsonDecode(topicsJson!);
@@ -58,7 +62,8 @@ class Influencer with ChangeNotifier {
     prefs.setString("email", _email);
     prefs.setString("password", _password);
     prefs.setString("instagram_id", _instagramId);
-    prefs.setString("location", _location);
+    prefs.setString("province", _province);
+    prefs.setString("city", _city);
     prefs.setBool("is_general_page", _isGeneralPage);
     List<Map> topicsMap = List.generate(
         _topicsList.length, (index) => _topicsList[index].toMap());
@@ -71,7 +76,8 @@ class Influencer with ChangeNotifier {
     this._email = data['email'];
     this._password = data['password'];
     this._instagramId = data['instagram_id'];
-    this._location = data['location'];
+    this._province = data['province'];
+    this._city = data['city'];
     this._isGeneralPage = data['is_general_page'];
     this._topicsList = data['topics'];
     notifyListeners();

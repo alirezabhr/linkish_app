@@ -291,12 +291,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                 "is_general_page": isGeneral,
                                 "topics": this._selectedTopicsList,
                               };
-                              // Map response = await WebApi().influencerSignup(data);
-                              // influencer.setUserData(data);
-                              // influencer.setUserId(response["id"]);
-                              // influencer.setToken("jwt " + response["token"]);
-                              // influencer.registerUser();
-                              // Navigator.pushReplacementNamed(context, "/home");
+                              Map response = await WebApi().influencerSignup(data);
+                              influencer.setUserData(data);
+                              influencer.setUserId(response["id"]);
+                              influencer.setToken("jwt " + response["token"]);
+                              influencer.registerUser();
+                              Navigator.pushReplacementNamed(context, "/home");
                             } on DioError catch (e) {
                               print(e.response!
                                   .data); // todo should add a validation, show the exception

@@ -85,7 +85,8 @@ class WebApi {
       "email": data['email'],
       "password": data['password'],
       "instagram_id": data['instagram_id'],
-      "location": data['location'],
+      "province": data['province'],
+      "city": data['city'],
       "is_general_page": data['is_general_page'],
       "topics": topicsPk,
     };
