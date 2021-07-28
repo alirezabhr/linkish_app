@@ -142,11 +142,19 @@ class _AdRowState extends State<AdRow> {
               : _suggestedAdsList.isEmpty
                   ? Center(
                       child: FittedBox(
-                      child: Text(
-                        "هیچ تبلیغی پیشنهاد نشده است",
-                        style: TextStyle(fontSize: 22),
+                        child: Column(
+                          children: [
+                            Image(
+                              image: AssetImage('assets/images/empty_state.gif'),
+                            ),
+                            Text(
+                              "هیچ تبلیغی پیشنهاد نشده است",
+                              style: TextStyle(fontSize: 40),
+                            ),
+                          ],
+                        ),
                       ),
-                    ))
+                    )
                   : Column(
                       children: [
                         Padding(

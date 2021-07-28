@@ -67,7 +67,7 @@ class _ApprovedAdListState extends State<ApprovedAdList> {
 
   @override
   Widget build(BuildContext context) {
-    if (flag==false) {
+    if (flag == false) {
       _influencer = Provider.of<Influencer>(context);
       flag = true;
     }
@@ -76,7 +76,19 @@ class _ApprovedAdListState extends State<ApprovedAdList> {
             child: CircularProgressIndicator(),
           )
         : _approvedAdsList.isEmpty
-            ? FittedBox(child: Text("هیچ تبلیغ پذیرفته شده ای ندارید", style: TextStyle(fontSize: 22)))
+            ? FittedBox(
+                child: Column(
+                  children: [
+                    Image(
+                      image: AssetImage('assets/images/empty_state.gif'),
+                    ),
+                    Text(
+                      "هیچ تبلیغ پذیرفته شده ای ندارید",
+                      style: TextStyle(fontSize: 40),
+                    ),
+                  ],
+                ),
+              )
             : Column(
                 children: List.generate(_approvedAdsList.length, (index) {
                   InfluencerAd _ad = _approvedAdsList[index];
