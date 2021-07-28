@@ -91,7 +91,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         child: Container(
           child: SingleChildScrollView(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
@@ -105,27 +104,29 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       borderRadius: BorderRadius.circular(4),
                       // labelText: 'Password',
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "ایمیل:",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[700],
-                          ),
-                        ),
-                        FittedBox(
-                          child: Text(
-                            emailAddress,
+                    child: FittedBox(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "ایمیل:",
                             style: TextStyle(
-                              fontSize: 18,
+                              fontSize: 16,
                               color: Colors.grey[700],
                             ),
-                            textDirection: TextDirection.ltr,
                           ),
-                        ),
-                      ],
+                          FittedBox(
+                            child: Text(
+                              emailAddress,
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey[700],
+                              ),
+                              textDirection: TextDirection.ltr,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -251,8 +252,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                             _isLoading = true;
                           });
 
-                          bool isValidInstagram = await isValidPage(_igIdController.text);
-                          print("is valid page: $isValidInstagram");
+                          // bool isValidInstagram = await isValidPage(_igIdController.text);
+                          // print("is valid page: $isValidInstagram");
+                          bool isValidInstagram = true;
                           if (isValidInstagram) {
                             bool isGeneral = _pageType == InstagramPageType.general ? true : false;
                             try {
@@ -281,7 +283,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         }
                       },
                       child: _isLoading
-                          ? CircularProgressIndicator()
+                          ? CircularProgressIndicator(color: Colors.white,)
                           : Text(
                               "ثبت نام",
                               style: TextStyle(fontSize: 16),

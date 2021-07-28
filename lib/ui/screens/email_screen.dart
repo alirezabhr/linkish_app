@@ -10,6 +10,7 @@ class EmailScreen extends StatefulWidget {
 
 class _EmailScreenState extends State<EmailScreen> {
   final TextEditingController _emailController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -22,10 +23,12 @@ class _EmailScreenState extends State<EmailScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 50,),
+            SizedBox(
+              height: 50,
+            ),
             Padding(
               padding:
-              const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
               child: Text(
                 "ایمیل خود را وارد نمایید:",
                 style: TextStyle(fontSize: 18),
@@ -34,7 +37,7 @@ class _EmailScreenState extends State<EmailScreen> {
             ),
             Padding(
               padding:
-              const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
               child: TextField(
                 controller: _emailController,
                 decoration: InputDecoration(
@@ -50,18 +53,29 @@ class _EmailScreenState extends State<EmailScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed: ()async {
+                  onPressed: () async {
+                    setState(() {
+                      _isLoading = true;
+                    });
+
                     try {
                       await WebApi().sendEmail(_emailController.text);
-                      Navigator.pushReplacementNamed(context, "/verification", arguments: _emailController.text);
+                      Navigator.pushReplacementNamed(context, "/verification",
+                          arguments: _emailController.text);
                     } catch (exception) {
-                      print(exception);   // todo should add a validation, show the exception
+                      print(
+                          exception); // todo should add a validation, show the exception
                     }
+                    setState(() {
+                      _isLoading = false;
+                    });
                   },
-                  child: Text(
-                    "ادامه",
-                    style: TextStyle(fontSize: 16),
-                  ),
+                  child: _isLoading
+                      ? CircularProgressIndicator(color: Colors.white,)
+                      : Text(
+                          "ادامه",
+                          style: TextStyle(fontSize: 16),
+                        ),
                 ),
               ],
             ),
