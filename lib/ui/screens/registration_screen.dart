@@ -1,9 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_insta/flutter_insta.dart';
 
+import '../widgets/location_selector.dart';
 import '../widgets/TopicSelector.dart';
 import '../../models/topic.dart';
 import '../../models/influencer.dart';
@@ -22,8 +26,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   final _igIdController = TextEditingController();
-  final _locationController = TextEditingController();
+  late final List<dynamic> _provincesAndCities;
+  String _province = "";
+  String _city = "";
   InstagramPageType? _pageType = InstagramPageType.general;
+  bool _isLoadingProvincesAndCities = false;
   bool _isLoading = false;
 
   List<Topic> _topicsList = [];
@@ -45,6 +52,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     });
   }
 
+  void setProvinceAndCity(String province, String city) {
+    setState(() {
+      this._province = province;
+      this._city = city;
+    });
+  }
+
   setData() async {
     List<Topic> topicsList = await WebApi().getTopicsList();
     this._topicsList = topicsList;
@@ -52,14 +66,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 
   Future<bool> isValidPage(String instagramId) async {
-
     try {
       FlutterInsta flutterInsta = new FlutterInsta();
       await flutterInsta.getProfileData(instagramId);
       int followers = int.parse(flutterInsta.followers!);
       if (followers < 10000) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("تعداد فالوئر شما کمتر از 10هزار نفر است")),
+          const SnackBar(
+              content: Text("تعداد فالوئر شما کمتر از 10هزار نفر است")),
         );
         return false;
       }
@@ -72,8 +86,21 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     return true;
   }
 
+  Future<void> loadCities() async {
+    setState(() {
+      _isLoadingProvincesAndCities = true;
+    });
+    final String response = await rootBundle.loadString(
+        'assets/jsons/iran_cities.json');
+    _provincesAndCities = await json.decode(response);
+    setState(() {
+      _isLoadingProvincesAndCities = false;
+    });
+  }
+
   @override
   void initState() {
+    this.loadCities();
     this.setData();
     super.initState();
   }
@@ -81,7 +108,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   @override
   Widget build(BuildContext context) {
     influencer = Provider.of<Influencer>(context);
-    String emailAddress = ModalRoute.of(context)!.settings.arguments as String;
+    String emailAddress = ModalRoute
+        .of(context)!
+        .settings
+        .arguments as String;
     return Scaffold(
       appBar: AppBar(
         title: Text("ثبت نام لینکیش"),
@@ -111,18 +141,21 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           Text(
                             "ایمیل:",
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                               color: Colors.grey[700],
                             ),
                           ),
-                          FittedBox(
-                            child: Text(
-                              emailAddress,
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.grey[700],
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: FittedBox(
+                              child: Text(
+                                emailAddress,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey[700],
+                                ),
+                                textDirection: TextDirection.ltr,
                               ),
-                              textDirection: TextDirection.ltr,
                             ),
                           ),
                         ],
@@ -183,19 +216,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 16.0, vertical: 10.0),
-                  child: TextFormField(
-                    controller: _locationController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'موقعیت مکانی',
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'فیلد خالی است';
-                      }
-                      return null;
-                    },
-                  ),
+                  child: _isLoadingProvincesAndCities
+                      ? CircularProgressIndicator()
+                      : LocationSelector(_provincesAndCities, this.setProvinceAndCity),
                 ),
                 ListTile(
                   title: const Text('محتوای پیج من عمومی است'),
@@ -236,10 +259,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       vertical: 2.0, horizontal: 16.0),
                   child: _pageType == InstagramPageType.pro
                       ? TopicSelector(
-                          this._topicsList,
-                          this._selectedTopicsList,
-                          this.appendItem,
-                          this.removeItem)
+                      this._topicsList,
+                      this._selectedTopicsList,
+                      this.appendItem,
+                      this.removeItem)
                       : null,
                 ),
                 Row(
@@ -256,24 +279,27 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           // print("is valid page: $isValidInstagram");
                           bool isValidInstagram = true;
                           if (isValidInstagram) {
-                            bool isGeneral = _pageType == InstagramPageType.general ? true : false;
+                            bool isGeneral = _pageType ==
+                                InstagramPageType.general ? true : false;
                             try {
                               Map data = {
                                 "email": emailAddress,
                                 "password": _passwordController.text,
                                 "instagram_id": _igIdController.text,
-                                "location": _locationController.text,
+                                "province": _province,
+                                "city": _city,
                                 "is_general_page": isGeneral,
                                 "topics": this._selectedTopicsList,
                               };
-                              Map response = await WebApi().influencerSignup(data);
-                              influencer.setUserData(data);
-                              influencer.setUserId(response["id"]);
-                              influencer.setToken("jwt " + response["token"]);
-                              influencer.registerUser();
-                              Navigator.pushReplacementNamed(context, "/home");
+                              // Map response = await WebApi().influencerSignup(data);
+                              // influencer.setUserData(data);
+                              // influencer.setUserId(response["id"]);
+                              // influencer.setToken("jwt " + response["token"]);
+                              // influencer.registerUser();
+                              // Navigator.pushReplacementNamed(context, "/home");
                             } on DioError catch (e) {
-                              print(e.response!.data); // todo should add a validation, show the exception
+                              print(e.response!
+                                  .data); // todo should add a validation, show the exception
                             }
                           }
 
@@ -285,9 +311,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       child: _isLoading
                           ? CircularProgressIndicator(color: Colors.white,)
                           : Text(
-                              "ثبت نام",
-                              style: TextStyle(fontSize: 16),
-                            ),
+                        "ثبت نام",
+                        style: TextStyle(fontSize: 16),
+                      ),
                     ),
                   ],
                 ),
