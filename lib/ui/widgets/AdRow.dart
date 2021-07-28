@@ -52,8 +52,8 @@ class _AdRowState extends State<AdRow> {
     try {
       _list1 = await WebApi().getApprovedAds(_userId);
       _list2 = await WebApi().getSuggestedAds(_userId);
-    } on DioError catch(e) {
-      if(e.response!.statusCode == 401) {
+    } on DioError catch (e) {
+      if (e.response!.statusCode == 401) {
         String _newToken = await WebApi().obtainToken();
         _influencer.setToken(_newToken);
         _list1 = await WebApi().getApprovedAds(_userId);
@@ -113,6 +113,10 @@ class _AdRowState extends State<AdRow> {
     });
   }
 
+  void _reportAd() async {
+    await getAds();
+  }
+
   @override
   void initState() {
     this.getAds();
@@ -121,7 +125,7 @@ class _AdRowState extends State<AdRow> {
 
   @override
   Widget build(BuildContext context) {
-    if (flag==false) {
+    if (flag == false) {
       _influencer = Provider.of<Influencer>(context);
       flag = true;
     }
@@ -133,95 +137,106 @@ class _AdRowState extends State<AdRow> {
     return Container(
       child: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : _hasActiveAd ? AdDetail(this._activeAd)
-          : _suggestedAdsList.isEmpty
-              ? Center(
-                  child: FittedBox(
-                    child: Text(
-                    "هیچ تبلیغی پیشنهاد نشده است",
-                    style: TextStyle(fontSize: 22),
-                ),
-                  ))
-              : Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+          : _hasActiveAd
+              ? AdDetail(this._activeAd)
+              : _suggestedAdsList.isEmpty
+                  ? Center(
+                      child: FittedBox(
                       child: Text(
-                        this._suggestedAd.ad.title,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
+                        "هیچ تبلیغی پیشنهاد نشده است",
+                        style: TextStyle(fontSize: 22),
+                      ),
+                    ))
+                  : Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 4),
+                          child: Text(
+                            this._suggestedAd.ad.title,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.symmetric(vertical: 6.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            // right button
-                            onPressed: _hasBefore ? showPreviousAd : null,
-                            icon: Icon(Icons.chevron_left),
-                            iconSize: 40,
-                            color: _hasBefore ? Colors.black : Colors.grey,
+                        Container(
+                          padding: EdgeInsets.symmetric(vertical: 6.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              IconButton(
+                                // right button
+                                onPressed: _hasBefore ? showPreviousAd : null,
+                                icon: Icon(Icons.chevron_left),
+                                iconSize: 40,
+                                color: _hasBefore ? Colors.black : Colors.grey,
+                              ),
+                              Container(
+                                height: height * 0.55,
+                                width: width * 0.65,
+                                decoration: BoxDecoration(border: Border.all()),
+                                child: Image.network(
+                                    "${WebApi.baseUrl}${_suggestedAd.ad.imageUrl}"),
+                              ),
+                              IconButton(
+                                // left button
+                                onPressed: _hasNext ? showNextAd : null,
+                                icon: Icon(Icons.chevron_right),
+                                iconSize: 40,
+                                color: _hasNext ? Colors.black : Colors.grey,
+                              ),
+                            ],
                           ),
-                          Container(
-                            height: height * 0.6,
-                            width: width * 0.65,
-                            decoration: BoxDecoration(border: Border.all()),
-                            child: Image.network(
-                                "${WebApi.baseUrl}${_suggestedAd.ad.imageUrl}"),
+                        ),
+                        Container(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              ElevatedButton.icon(
+                                icon: Icon(Icons.check_sharp),
+                                onPressed: () async {
+                                  await WebApi().confirmAd(
+                                      this._userId, this._suggestedAd.id);
+                                  await getAds();
+                                },
+                                label: Text("تایید تبلیغ"),
+                                style: buttonStyle,
+                              ),
+                              ElevatedButton.icon(
+                                  icon: Icon(Icons.close_sharp),
+                                  onPressed: () async {
+                                    await WebApi().rejectAd(
+                                        this._userId, this._suggestedAd.id);
+                                    await getAds();
+                                  },
+                                  label: Text("مرتبط نیست"),
+                                  style: buttonStyle),
+                            ],
                           ),
-                          IconButton(
-                            // left button
-                            onPressed: _hasNext ? showNextAd : null,
-                            icon: Icon(Icons.chevron_right),
-                            iconSize: 40,
-                            color: _hasNext ? Colors.black : Colors.grey,
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.symmetric(vertical: 20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () async {
-                              await WebApi().confirmAd(this._userId, this._suggestedAd.id);
-                              await getAds();
+                        ),
+                        Container(
+                          alignment: Alignment.center,
+                          child: TextButton.icon(
+                            icon: Icon(Icons.warning_amber_rounded),
+                            onPressed: () {
+                              showDialog<void>(
+                                  context: context,
+                                  builder: (context) => ReportDialog(
+                                        this._userId,
+                                        this._suggestedAd.id,
+                                        this._reportAd,
+                                      ));
                             },
-                            child: Text("تایید تبلیغ"),
-                            style: buttonStyle,
+                            label: Text(
+                              "گزارش مشکل",
+                              style: TextStyle(color: Colors.red),
+                            ),
+                            style: ElevatedButton.styleFrom(),
                           ),
-                          ElevatedButton(
-                              onPressed: () async {
-                                await WebApi().rejectAd(
-                                    this._userId, this._suggestedAd.id);
-                                await getAds();
-                              },
-                              child: Text("مرتبط نیست"),
-                              style: buttonStyle),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    Container(
-                      alignment: Alignment.center,
-                      child: ElevatedButton(
-                          onPressed: () {
-                            showDialog<void>(
-                                context: context,
-                                builder: (context) => ReportDialog(
-                                    this._userId, this._suggestedAd.id));
-                            // todo callback function for refreshing
-                          },
-                          child: Text("گزارش مشکل"),
-                          style: buttonStyle),
-                    ),
-                  ],
-                ),
     );
   }
 }

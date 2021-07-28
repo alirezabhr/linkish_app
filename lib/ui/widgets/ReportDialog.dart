@@ -6,15 +6,15 @@ import '../../services/web_api.dart';
 final List<String> _reportMessages = [
   "محتوای غیراخلاقی",
   "محتوای سیاسی",
-  "مشکل در دانلود محتوا",
   "سایر"
 ];
 
 class ReportDialog extends StatefulWidget {
   final int _userPk;
   final int _adId;
+  final Function() report;
 
-  ReportDialog(this._userPk, this._adId);
+  ReportDialog(this._userPk, this._adId, this.report);
 
   @override
   _ReportDialogState createState() => _ReportDialogState();
@@ -85,6 +85,7 @@ class _ReportDialogState extends State<ReportDialog> {
                   reportMsg = dropdownValue;
                 }
                 await WebApi().reportAd(this.widget._userPk, this.widget._adId, reportMsg);
+                widget.report();
                 Navigator.of(context).pop();
               }
             },
