@@ -8,8 +8,8 @@ import '../models/suggested_ad.dart';
 import '../models/influencer_ad.dart';
 
 class WebApi {
-  static final String baseUrl = "http://192.168.1.9:8000";
-  final String _baseUrl = "http://192.168.1.9:8000/";
+  static final String baseUrl = "http://103.215.221.15";
+  final String _baseUrl = "http://103.215.221.15/";
   late final String _obtainTokenUrl;
   late final String _emailUrl;
   late final String _otpUrl;
@@ -53,7 +53,11 @@ class WebApi {
 
   Future<void> sendEmail(String email) async {
     Map body = {'email': email};
-    await Dio().post(this._emailUrl, data: body);
+    try {
+      await Dio().post(this._emailUrl, data: body);
+    } on DioError catch(e) {
+      print(e.response!.data);
+    }
   }
 
   Future<void> checkOtp(String email, String otp) async {
