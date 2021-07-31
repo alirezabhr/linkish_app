@@ -271,41 +271,43 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     ElevatedButton(
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
-                          setState(() {
-                            _isLoading = true;
-                          });
+                          if (!_isLoading) {
+                            setState(() {
+                              _isLoading = true;
+                            });
 
-                          // bool isValidInstagram = await isValidPage(_igIdController.text);
-                          // print("is valid page: $isValidInstagram");
-                          bool isValidInstagram = true;
-                          if (isValidInstagram) {
-                            bool isGeneral = _pageType ==
-                                InstagramPageType.general ? true : false;
-                            try {
-                              Map data = {
-                                "email": emailAddress,
-                                "password": _passwordController.text,
-                                "instagram_id": _igIdController.text,
-                                "province": _province,
-                                "city": _city,
-                                "is_general_page": isGeneral,
-                                "topics": this._selectedTopicsList,
-                              };
-                              Map response = await WebApi().influencerSignup(data);
-                              influencer.setUserData(data);
-                              influencer.setUserId(response["id"]);
-                              influencer.setToken("jwt " + response["token"]);
-                              influencer.registerUser();
-                              Navigator.pushReplacementNamed(context, "/home");
-                            } on DioError catch (e) {
-                              print(e.response!
-                                  .data); // todo should add a validation, show the exception
+                            // bool isValidInstagram = await isValidPage(_igIdController.text);
+                            // print("is valid page: $isValidInstagram");
+                            bool isValidInstagram = true;
+                            if (isValidInstagram) {
+                              bool isGeneral = _pageType ==
+                                  InstagramPageType.general ? true : false;
+                              try {
+                                Map data = {
+                                  "email": emailAddress,
+                                  "password": _passwordController.text,
+                                  "instagram_id": _igIdController.text,
+                                  "province": _province,
+                                  "city": _city,
+                                  "is_general_page": isGeneral,
+                                  "topics": this._selectedTopicsList,
+                                };
+                                Map response = await WebApi().influencerSignup(data);
+                                influencer.setUserData(data);
+                                influencer.setUserId(response["id"]);
+                                influencer.setToken("jwt " + response["token"]);
+                                influencer.registerUser();
+                                Navigator.pushReplacementNamed(context, "/home");
+                              } on DioError catch (e) {
+                                print(e.response!
+                                    .data); // todo should add a validation, show the exception
+                              }
                             }
-                          }
 
-                          setState(() {
-                            _isLoading = false;
-                          });
+                            setState(() {
+                              _isLoading = false;
+                            });
+                          }
                         }
                       },
                       child: _isLoading

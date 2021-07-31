@@ -57,20 +57,21 @@ class _EmailScreenState extends State<EmailScreen> {
                     padding: EdgeInsets.all(10),
                     child: ElevatedButton(
                       onPressed: () async {
-                        setState(() {
-                          _isLoading = true;
-                        });
-
-                        try {
-                          await WebApi().sendEmail(_emailController.text);
-                          Navigator.pushReplacementNamed(context, "/verification",
-                              arguments: _emailController.text);
-                        } catch (exception) {
-                          print(exception); // todo should add a validation, show the exception
+                        if (!_isLoading) {
+                          setState(() {
+                            _isLoading = true;
+                          });
+                          try {
+                            await WebApi().sendEmail(_emailController.text);
+                            Navigator.pushReplacementNamed(context, "/verification",
+                                arguments: _emailController.text);
+                          } catch (exception) {
+                            print(exception); // todo should add a validation, show the exception
+                          }
+                          setState(() {
+                            _isLoading = false;
+                          });
                         }
-                        setState(() {
-                          _isLoading = false;
-                        });
                       },
                       child: _isLoading
                           ? CircularProgressIndicator(color: Colors.white,)

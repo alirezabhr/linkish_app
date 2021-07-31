@@ -12,6 +12,7 @@ class VerificationScreen extends StatefulWidget {
 class _VerificationScreenState extends State<VerificationScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _otpController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -82,9 +83,9 @@ class _VerificationScreenState extends State<VerificationScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ElevatedButton.icon(
-                      onPressed:() {
-                              Navigator.pushReplacementNamed(context, '/email');
-                            },
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, '/email');
+                      },
                       icon: Icon(Icons.email),
                       label: Text('تصحیح ایمیل'),
                     ),
@@ -103,34 +104,45 @@ class _VerificationScreenState extends State<VerificationScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                   Expanded(
-                        child:  Container(
-                          padding: EdgeInsets.all(10),
-                          child: ElevatedButton(
+                    Expanded(
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        child: ElevatedButton(
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
-                              try {
-                                await WebApi()
-                                    .checkOtp(emailAddress, _otpController.text);
-                                Navigator.pushReplacementNamed(
-                                    context, "/registration",
-                                    arguments: emailAddress);
-                              } on DioError catch (exception) {
-                                if (exception.response!.statusCode == 400) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text("رمز یکبار مصرف اشتباه است")),
-                                  );
+                              if (!_isLoading) {
+                                setState(() {
+                                  _isLoading = true;
+                                });
+                                try {
+                                  await WebApi().checkOtp(
+                                      emailAddress, _otpController.text);
+                                  Navigator.pushReplacementNamed(
+                                      context, "/registration",
+                                      arguments: emailAddress);
+                                } on DioError catch (exception) {
+                                  if (exception.response!.statusCode == 400) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              "رمز یکبار مصرف اشتباه است")),
+                                    );
+                                  }
+                                  print(
+                                      exception); // todo should add a validation, show the exception
                                 }
-                                print(
-                                    exception); // todo should add a validation, show the exception
+                                setState(() {
+                                  _isLoading = true;
+                                });
                               }
                             }
                           },
-                          child: Text(
-                            "ادامه",
-                            style: TextStyle(fontSize: 16),
-                          ),
+                          child: _isLoading
+                              ? CircularProgressIndicator(color: Colors.white,)
+                              : Text(
+                                  "ادامه",
+                                  style: TextStyle(fontSize: 16),
+                                ),
                         ),
                       ),
                     ),
