@@ -129,89 +129,91 @@ class _AdDetailState extends State<AdDetail> {
         utils.calculateRemainTime(this.widget.influencerAd.approvedAt);
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10.0),
-            child: Text(
-              widget.influencerAd.ad.title,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10.0),
+              child: Text(
+                widget.influencerAd.ad.title,
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
             ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 12.0),
-            decoration: BoxDecoration(),
-            child: FittedBox(
-              child: Image.network(
-                  "${WebApi.baseUrl}${widget.influencerAd.ad.imageUrl}"),
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 12.0),
+              decoration: BoxDecoration(),
+              child: FittedBox(
+                child: Image.network(
+                    "${WebApi.baseUrl}${widget.influencerAd.ad.imageUrl}"),
+              ),
             ),
-          ),
-          FittedBox(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: EdgeInsets.all(8),
-                  margin: EdgeInsets.symmetric(horizontal: 10),
-                  decoration: BoxDecoration(
-                    border: Border.all(),
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
+            FittedBox(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    margin: EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      border: Border.all(),
+                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                    ),
+                    child: Text(
+                      widget.influencerAd.shortLink,
+                      style: TextStyle(fontFamily: 'Arial'),
+                    ),
                   ),
-                  child: Text(
-                    widget.influencerAd.shortLink,
-                    style: TextStyle(fontFamily: 'Arial'),
+                  ElevatedButton.icon(
+                    icon: Icon(Icons.copy),
+                    onPressed: () async {
+                      await _copyToClipboard(widget.influencerAd.shortLink);
+                    },
+                    label: Text("کپی"),
                   ),
-                ),
-                ElevatedButton.icon(
-                  icon: Icon(Icons.copy),
-                  onPressed: () async {
-                    await _copyToClipboard(widget.influencerAd.shortLink);
-                  },
-                  label: Text("کپی"),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          FittedBox(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 12.0, horizontal: 8.0),
-                  child: Text(
-                    "نوع محتوا: ${widget.influencerAd.ad.isVideo ? "ویدئو" : "عکس"}",
-                    style: TextStyle(fontSize: 16),
+            FittedBox(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12.0, horizontal: 8.0),
+                    child: Text(
+                      "نوع محتوا: ${widget.influencerAd.ad.isVideo ? "ویدئو" : "عکس"}",
+                      style: TextStyle(fontSize: 15),
+                    ),
                   ),
-                ),
-                ElevatedButton.icon(
-                  icon: Icon(Icons.download_sharp),
-                  onPressed: () async {
-                    String mediaUrl = widget.influencerAd.ad.isVideo
-                        ? widget.influencerAd.ad.videoUrl
-                        : widget.influencerAd.ad.imageUrl;
-                    mediaUrl = WebApi.baseUrl + mediaUrl;
-                    await downloadFile(
-                        mediaUrl, widget.influencerAd.ad.isVideo);
-                  },
-                  label: Text("دانلود"),
-                ),
-              ],
+                  ElevatedButton.icon(
+                    icon: Icon(Icons.download_sharp),
+                    onPressed: () async {
+                      String mediaUrl = widget.influencerAd.ad.isVideo
+                          ? widget.influencerAd.ad.videoUrl
+                          : widget.influencerAd.ad.imageUrl;
+                      mediaUrl = WebApi.baseUrl + mediaUrl;
+                      await downloadFile(
+                          mediaUrl, widget.influencerAd.ad.isVideo);
+                    },
+                    label: Text("دانلود"),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Text(_isDownloading
-              ? "دانلود شده: $progress%"
-              : _isDownloaded
-                  ? "با موفقیت دانلود شد"
-                  : ""),
-          Container(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              "زمان باقی مانده کمپین: " + remainingTime,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            Text(_isDownloading
+                ? "دانلود شده: $progress%"
+                : _isDownloaded
+                    ? "با موفقیت دانلود شد"
+                    : ""),
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                "زمان باقی مانده کمپین: " + remainingTime,
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
