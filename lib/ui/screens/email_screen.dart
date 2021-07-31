@@ -66,8 +66,7 @@ class _EmailScreenState extends State<EmailScreen> {
                           Navigator.pushReplacementNamed(context, "/verification",
                               arguments: _emailController.text);
                         } catch (exception) {
-                          print(
-                              exception); // todo should add a validation, show the exception
+                          print(exception); // todo should add a validation, show the exception
                         }
                         setState(() {
                           _isLoading = false;
