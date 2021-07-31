@@ -96,6 +96,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     setState(() {
       _isLoadingProvincesAndCities = false;
     });
+    this._province = _provincesAndCities.first['name'];
+    this._city = _provincesAndCities.first['cities'].first['name'];
   }
 
   @override

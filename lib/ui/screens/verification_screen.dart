@@ -132,7 +132,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                       exception); // todo should add a validation, show the exception
                                 }
                                 setState(() {
-                                  _isLoading = true;
+                                  _isLoading = false;
                                 });
                               }
                             }
