@@ -138,14 +138,21 @@ class _AdRowState extends State<AdRow> {
       child: _isLoading
           ? Center(child: CircularProgressIndicator())
           : _hasActiveAd
-              ? AdDetail(this._activeAd)
+              ? SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      AdDetail(this._activeAd),
+                    ],
+                  ),
+                )
               : _suggestedAdsList.isEmpty
                   ? Center(
                       child: FittedBox(
                         child: Column(
                           children: [
                             Image(
-                              image: AssetImage('assets/images/empty_state.gif'),
+                              image:
+                                  AssetImage('assets/images/empty_state.gif'),
                             ),
                             Text(
                               "هیچ تبلیغی پیشنهاد نشده است",
