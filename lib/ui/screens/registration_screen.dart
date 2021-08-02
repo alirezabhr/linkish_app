@@ -90,8 +90,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     setState(() {
       _isLoadingProvincesAndCities = true;
     });
-    final String response = await rootBundle.loadString(
-        'assets/jsons/iran_cities.json');
+    final String response =
+        await rootBundle.loadString('assets/jsons/iran_cities.json');
     _provincesAndCities = await json.decode(response);
     setState(() {
       _isLoadingProvincesAndCities = false;
@@ -110,10 +110,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   @override
   Widget build(BuildContext context) {
     influencer = Provider.of<Influencer>(context);
-    String emailAddress = ModalRoute
-        .of(context)!
-        .settings
-        .arguments as String;
+    String emailAddress = ModalRoute.of(context)!.settings.arguments as String;
     return Scaffold(
       appBar: AppBar(
         title: Text("ثبت نام لینکیش"),
@@ -220,7 +217,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       horizontal: 16.0, vertical: 10.0),
                   child: _isLoadingProvincesAndCities
                       ? CircularProgressIndicator()
-                      : LocationSelector(_provincesAndCities, this.setProvinceAndCity),
+                      : LocationSelector(
+                          _provincesAndCities, this.setProvinceAndCity),
                 ),
                 ListTile(
                   title: const Text('محتوای پیج من عمومی است'),
@@ -261,66 +259,87 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       vertical: 2.0, horizontal: 16.0),
                   child: _pageType == InstagramPageType.pro
                       ? TopicSelector(
-                      this._topicsList,
-                      this._selectedTopicsList,
-                      this.appendItem,
-                      this.removeItem)
+                          this._topicsList,
+                          this._selectedTopicsList,
+                          this.appendItem,
+                          this.removeItem)
                       : null,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    ElevatedButton(
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          if (!_isLoading) {
-                            setState(() {
-                              _isLoading = true;
-                            });
+                    Expanded(
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
+                              bool isGeneralPage =
+                                  _pageType == InstagramPageType.general
+                                      ? true
+                                      : false;
+                              if (!isGeneralPage && _selectedTopicsList.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        "هیچ محتوایی برای پیج خود انتخاب نکرده اید."),
+                                  ),
+                                );
+                              }
 
-                            // bool isValidInstagram = await isValidPage(_igIdController.text);
-                            // print("is valid page: $isValidInstagram");
-                            bool isValidInstagram = true;
-                            if (isValidInstagram) {
-                              bool isGeneral = _pageType ==
-                                  InstagramPageType.general ? true : false;
-                              try {
-                                Map data = {
-                                  "email": emailAddress,
-                                  "password": _passwordController.text,
-                                  "instagram_id": _igIdController.text,
-                                  "province": _province,
-                                  "city": _city,
-                                  "is_general_page": isGeneral,
-                                  "topics": this._selectedTopicsList,
-                                };
-                                Map response = await WebApi().influencerSignup(data);
-                                influencer.setUserData(data);
-                                influencer.setUserId(response["id"]);
-                                influencer.setToken("jwt " + response["token"]);
-                                influencer.registerUser();
-                                Navigator.pushReplacementNamed(context, "/home");
-                              } on DioError catch (e) {
-                                print(e.response!
-                                    .data); // todo should add a validation, show the exception
+                              if (!_isLoading) {
+                                setState(() {
+                                  _isLoading = true;
+                                });
+
+                                // bool isValidInstagram = await isValidPage(_igIdController.text);
+                                // print("is valid page: $isValidInstagram");
+                                bool isValidInstagram = true;
+                                if (isValidInstagram) {
+                                  try {
+                                    Map data = {
+                                      "email": emailAddress,
+                                      "password": _passwordController.text,
+                                      "instagram_id": _igIdController.text,
+                                      "province": _province,
+                                      "city": _city,
+                                      "is_general_page": isGeneralPage,
+                                      "topics": this._selectedTopicsList,
+                                    };
+                                    Map response =
+                                        await WebApi().influencerSignup(data);
+                                    influencer.setUserData(data);
+                                    influencer.setUserId(response["id"]);
+                                    influencer.setToken("jwt " + response["token"]);
+                                    influencer.registerUser();
+                                    Navigator.pushReplacementNamed(
+                                        context, "/home");
+                                  } on DioError catch (e) {
+                                    print(e.response!
+                                        .data); // todo should add a validation, show the exception
+                                  }
+                                }
+
+                                setState(() {
+                                  _isLoading = false;
+                                });
                               }
                             }
-
-                            setState(() {
-                              _isLoading = false;
-                            });
-                          }
-                        }
-                      },
-                      child: _isLoading
-                          ? CircularProgressIndicator(color: Colors.white,)
-                          : Text(
-                        "ثبت نام",
-                        style: TextStyle(fontSize: 16),
+                          },
+                          child: _isLoading
+                              ? CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                              : Text(
+                                  "ثبت نام",
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                        ),
                       ),
                     ),
                   ],
                 ),
+                SizedBox(height: 20,)
               ],
             ),
           ),
