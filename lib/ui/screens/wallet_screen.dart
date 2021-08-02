@@ -1,12 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:linkish/models/influencer.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../models/influencer_ad.dart';
+import '../../models/influencer.dart';
 import '../widgets/WalletReport.dart';
+import '../widgets/active_ad.dart';
 import '../../services/web_api.dart';
+import '../../services/utils.dart' as utils;
 
 class WalletScreen extends StatefulWidget {
   const WalletScreen({Key? key}) : super(key: key);
@@ -16,23 +18,39 @@ class WalletScreen extends StatefulWidget {
 }
 
 class _WalletScreenState extends State<WalletScreen> {
+  late final InfluencerAd activeAd;
   late final Influencer _influencer;
   bool flag = false;
   bool _isLoading = true;
+  bool _hasActiveAd = false;
   List<InfluencerAd> _walletList = [];
   int _totalIncome = 0;
 
   void getWallet() async {
+    setState(() {
+      _isLoading = true;
+      _hasActiveAd = false;
+    });
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     int? userId = _prefs.getInt("id");
     List<InfluencerAd> tmpList = await WebApi().getWallet(userId!);
+    List<InfluencerAd> approvedList = [];
     int earnings = 0;
+
     for (InfluencerAd ad in tmpList) {
-      earnings += ad.income;
+      if (!utils.isActiveAd(ad)) {
+        approvedList.add(ad);
+        earnings += (ad.income * ((100-ad.deduction)/100)).round();
+      } else {
+        activeAd = ad;
+        setState(() {
+          _hasActiveAd = true;
+        });
+      }
     }
     
     setState(() {
-      _walletList = tmpList;
+      _walletList.addAll(approvedList);
       _totalIncome = earnings;
       _isLoading = false;
     });
@@ -146,10 +164,19 @@ class _WalletScreenState extends State<WalletScreen> {
                   ? Center(
                       child: CircularProgressIndicator(),
                     )
-                  : Column(
-                      children: List.generate(_walletList.length,
-                          (index) => WalletReport(_walletList[index])),
+                  : SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Container(
+                          child: _hasActiveAd ? WalletActiveAd(activeAd) : null,
+                        ),
+                        Column(
+                            children: List.generate(_walletList.length,
+                                (index) => WalletReport(_walletList[index])),
+                          ),
+                      ],
                     ),
+                  ),
             ),
           ],
         ),

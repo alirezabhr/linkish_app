@@ -10,6 +10,7 @@ class WalletReport extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final multiple = (100-influencerAd.deduction)/100;
     return Column(
       children: [
         ListTile(
@@ -20,10 +21,10 @@ class WalletReport extends StatelessWidget {
           ),
           title: Text(influencerAd.ad.title),
           trailing: Text(
-            "درآمد: ${influencerAd.income}",
+            "درآمد: ${(influencerAd.income * multiple).round()}",
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          subtitle: Text(getNextDay(influencerAd.approvedAt.substring(0, 19))),
+          subtitle: Text(getNextDay(influencerAd.approvedAt)),
         ),
         Divider(thickness: 1.5),
       ],
