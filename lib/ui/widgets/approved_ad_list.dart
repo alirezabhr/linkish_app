@@ -1,11 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:linkish/ui/widgets/active_ad.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'approved_ad_list_tile.dart';
 
 import '../../services/web_api.dart';
+import '../../services/utils.dart';
 import '../../models/influencer_ad.dart';
 import '../../models/influencer.dart';
 
@@ -18,9 +20,11 @@ class ApprovedAdList extends StatefulWidget {
 
 class _ApprovedAdListState extends State<ApprovedAdList> {
   late final Influencer _influencer;
+  late final InfluencerAd _activeAd;
   bool flag = false;
   int _userId = 0;
   bool _isLoading = true;
+  bool _hasActiveAd = false;
   List<InfluencerAd> _allSuggestedAdsList = [];
   List<InfluencerAd> _approvedAdsList = [];
 
@@ -35,6 +39,7 @@ class _ApprovedAdListState extends State<ApprovedAdList> {
     }
 
     setState(() {
+      _hasActiveAd = false;
       _isLoading = true;
     });
     List<InfluencerAd> _list = [];
@@ -48,7 +53,15 @@ class _ApprovedAdListState extends State<ApprovedAdList> {
       }
     }
     setState(() {
-      this._allSuggestedAdsList = _list;
+      for (InfluencerAd item in _list) {
+        if (!isActiveAd(item)) {
+          _allSuggestedAdsList.add(item);
+        } else {
+          _hasActiveAd = true;
+          _activeAd = item;
+        }
+      }
+
       this._approvedAdsList = [];
 
       for (InfluencerAd item in _allSuggestedAdsList) {
@@ -75,7 +88,7 @@ class _ApprovedAdListState extends State<ApprovedAdList> {
         ? Center(
             child: CircularProgressIndicator(),
           )
-        : _approvedAdsList.isEmpty
+        : _approvedAdsList.isEmpty && !_hasActiveAd
             ? FittedBox(
                 child: Column(
                   children: [
@@ -90,15 +103,22 @@ class _ApprovedAdListState extends State<ApprovedAdList> {
                 ),
               )
             : Column(
-                children: List.generate(_approvedAdsList.length, (index) {
-                  InfluencerAd _ad = _approvedAdsList[index];
-                  return Column(
-                    children: [
-                      ApprovedAdListTile(_ad),
-                      Divider(thickness: 1.5),
-                    ],
-                  );
-                }),
-              );
+              children: [
+                Container(
+                  child: _hasActiveAd ? ApprovedActiveAd(_activeAd) : null,
+                ),
+                Column(
+                    children: List.generate(_approvedAdsList.length, (index) {
+                      InfluencerAd _ad = _approvedAdsList[index];
+                      return Column(
+                        children: [
+                          ApprovedAdListTile(_ad),
+                          Divider(thickness: 1.5),
+                        ],
+                      );
+                    }),
+                  ),
+              ],
+            );
   }
 }

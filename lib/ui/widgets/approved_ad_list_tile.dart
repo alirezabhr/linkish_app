@@ -30,14 +30,14 @@ class _ApprovedAdListTileState extends State<ApprovedAdListTile> {
                     Row(
                       children: [
                         Text("شروع کمپین: "),
-                        Text(widget.influencerAd.approvedAt.substring(0, 19)),
+                        Text(widget.influencerAd.approvedAt),
                       ],
                     ),
                     Row(
                       children: [
                         Text("پایان کمپین: "),
                         Text(
-                            "${getNextDay(widget.influencerAd.approvedAt.substring(0, 19))}"),
+                            "${getNextDay(widget.influencerAd.approvedAt)}"),
                       ],
                     ),
                     Text(
