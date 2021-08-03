@@ -40,7 +40,8 @@ class _WalletScreenState extends State<WalletScreen> {
     for (InfluencerAd ad in tmpList) {
       if (!utils.isActiveAd(ad)) {
         approvedList.add(ad);
-        earnings += (ad.income * ((100-ad.deduction)/100)).round();
+        int _income = (ad.clicks * (100-ad.deduction)/100).round() * ad.cpc;
+        earnings += _income;
       } else {
         activeAd = ad;
         setState(() {
@@ -69,7 +70,7 @@ class _WalletScreenState extends State<WalletScreen> {
         );
       } on DioError {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("در حال حاضر قادر به برداشت وجه نیستید. لظفا بعدا تلاش کنید.")),
+          const SnackBar(content: Text("در حال حاضر قادر به برداشت وجه نیستید. لطفا بعدا تلاش کنید.")),
         );
       }
     }

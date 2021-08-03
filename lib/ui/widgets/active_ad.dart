@@ -23,7 +23,7 @@ class WalletActiveAd extends StatelessWidget {
         ),
         title: Text(influencerAd.ad.title),
         trailing: Text(
-          "درآمد: ${(influencerAd.income * DEDUCTION_MULTIPLE).round()}",
+          "درآمد: ${(influencerAd.clicks * DEDUCTION_MULTIPLE).round() * influencerAd.cpc}",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Row(

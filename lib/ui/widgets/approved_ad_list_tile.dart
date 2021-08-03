@@ -5,7 +5,6 @@ import '../../services/utils.dart';
 
 class ApprovedAdListTile extends StatefulWidget {
   final InfluencerAd influencerAd;
-
   ApprovedAdListTile(this.influencerAd);
 
   @override
@@ -17,6 +16,9 @@ class _ApprovedAdListTileState extends State<ApprovedAdListTile> {
 
   @override
   Widget build(BuildContext context) {
+    var _multiple = (100 - widget.influencerAd.deduction) /100;
+    var _cpc = widget.influencerAd.cpc;
+    var _income = (widget.influencerAd.clicks * _multiple).round() * _cpc;
     return _isExpanded
         ? Container(
             child: ListTile(
@@ -41,7 +43,7 @@ class _ApprovedAdListTileState extends State<ApprovedAdListTile> {
                       ],
                     ),
                     Text(
-                      "دریافتی: ${widget.influencerAd.income} تومان",
+                      "دریافتی: $_incomeتومان",
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
