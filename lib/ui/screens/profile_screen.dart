@@ -119,6 +119,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           Expanded(child: SizedBox()),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: 4.0,
+              horizontal: 8.0,
+            ),
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed('/contact-us');
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(Icons.email_outlined),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "ارتباط با ما",
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
           TextButton(
             style: ElevatedButton.styleFrom(
                 primary: Colors.white, shadowColor: Colors.white),
