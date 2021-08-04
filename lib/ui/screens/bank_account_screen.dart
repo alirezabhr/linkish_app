@@ -20,17 +20,39 @@ class _BankAccountScreenState extends State<BankAccountScreen> {
   String _accountNo = "";
   final TextEditingController _cardNoController = TextEditingController();
   final TextEditingController _accountNoController = TextEditingController();
+  bool _flag = false;
   bool _isSending = false;
   bool _isLoading = false;
+  late final int userId;
 
-  setBankAccountData(int userId, String cardNo, String accountNo) async {
+  setBankAccountData(Influencer influencer, String cardNo, String accountNo) async {
     setState(() {
       _isSending = true;
     });
-    await WebApi().setBankAccount(userId, cardNo, accountNo);
-    setState(() {
-      _isSending = false;
-    });
+    try {
+      await WebApi().setBankAccount(influencer, cardNo, accountNo);
+      influencer.setBankCardNo(cardNo);
+      influencer.setBankAccountNo(accountNo);
+      setState(() {
+        _cardNo = cardNo;
+        _accountNo = accountNo;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("شماره کارت شما با موفقیت ثبت شد."),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("در حال حاضر این عملیات امکان پذیر نمی باشد."),
+        ),
+      );
+    } finally {
+      setState(() {
+        _isSending = false;
+      });
+    }
   }
 
   getBankAccount(int userId) async {
@@ -40,7 +62,7 @@ class _BankAccountScreenState extends State<BankAccountScreen> {
     Map data = await WebApi().getBankAccount(userId);
 
     if (data['account_number']!="") {
-      this._accountNo = data['account_number'];;
+      this._accountNo = data['account_number'];
     } else {
       this._accountNo = "شماره شبا ثبت نشده است";
     }
@@ -64,14 +86,28 @@ class _BankAccountScreenState extends State<BankAccountScreen> {
 
   @override
   void initState() {
-    setData();
+    // setData();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     final Influencer influencer = Provider.of<Influencer>(context);
-    final int userId = influencer.userId;
+    if (!_flag) {
+      _flag = true;
+      userId = influencer.userId;
+      if (influencer.bankAccountNo!="") {
+        this._accountNo = influencer.bankAccountNo;
+      } else {
+        this._accountNo = "شماره شبا ثبت نشده است";
+      }
+
+      if (influencer.bankCardNo!="") {
+        this._cardNo = utils.addDashCardNo(influencer.bankCardNo);
+      } else {
+        this._cardNo = "شماره کارت ثبت نشده است";
+      }
+    }
     return Scaffold(
       appBar: AppBar(title: Text("تنظیمات حساب بانکی")),
       body: Container(
@@ -167,8 +203,8 @@ class _BankAccountScreenState extends State<BankAccountScreen> {
                           if (_formKey.currentState!.validate()) {
                             String cardNo = _cardNoController.text;
                             String accountNo = _accountNoController.text;
-                            await setBankAccountData(userId, cardNo, accountNo);
-                            await getBankAccount(userId);
+                            await setBankAccountData(influencer, cardNo, accountNo);
+                            // await getBankAccount(userId);
                           }
                         },
                         child: Row(
