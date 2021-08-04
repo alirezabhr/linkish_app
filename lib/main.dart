@@ -12,6 +12,7 @@ import 'ui/screens/home_screen.dart';
 import 'ui/screens/bank_account_screen.dart';
 import 'ui/screens/password_screen.dart';
 import 'ui/screens/change_profile_screen.dart';
+import 'ui/screens/contact_us_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -44,6 +45,7 @@ class MyApp extends StatelessWidget {
           '/bank-account': (ctx) => BankAccountScreen(),
           '/password': (ctx) => PassWordScreen(),
           '/change-profile': (ctx) => ChangeProfileScreen(),
+          '/contact-us': (ctx) => ContactUsScreen(),
         },
       ),
     );
