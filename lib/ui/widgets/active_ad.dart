@@ -10,6 +10,8 @@ class WalletActiveAd extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String startTime = influencerAd.approvedAt;
+    final double clicks2 = influencerAd.clicks * DEDUCTION_MULTIPLE;
+    final int number = clicks2.toInt();
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: Colors.red),
@@ -23,7 +25,7 @@ class WalletActiveAd extends StatelessWidget {
         ),
         title: Text(influencerAd.ad.title),
         trailing: Text(
-          "درآمد: ${(influencerAd.clicks * DEDUCTION_MULTIPLE).round() * influencerAd.cpc}",
+          "درآمد: ${number * influencerAd.cpc}",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Row(
