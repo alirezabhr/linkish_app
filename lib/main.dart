@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -10,6 +11,7 @@ import 'ui/screens/registration_screen.dart';
 import 'ui/screens/home_screen.dart';
 import 'ui/screens/bank_account_screen.dart';
 import 'ui/screens/password_screen.dart';
+import 'ui/screens/change_profile_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -41,6 +43,7 @@ class MyApp extends StatelessWidget {
           '/home': (ctx) => HomePage(),
           '/bank-account': (ctx) => BankAccountScreen(),
           '/password': (ctx) => PassWordScreen(),
+          '/change-profile': (ctx) => ChangeProfileScreen(),
         },
       ),
     );
