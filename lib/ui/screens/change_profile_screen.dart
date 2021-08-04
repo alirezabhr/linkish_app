@@ -37,8 +37,9 @@ class _ChangeProfileScreenState extends State<ChangeProfileScreen> {
     this._topicsList.sort((a, b) => a.title.compareTo(b.title));
     List<Topic> _currentTopics = await utils.getUserTopics();
 
-    for (Topic topic in _currentTopics) {
-      this.appendItem(topic);
+    for (Topic currentTopic in _currentTopics) {
+      _topicsList.removeWhere((element) => element.title == currentTopic.title);
+      _selectedTopicsList.add(currentTopic);
     }
 
     setState(() {
