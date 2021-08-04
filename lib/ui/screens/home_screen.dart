@@ -51,7 +51,7 @@ class _HomePageState extends State<HomePage> {
             label: 'کیف پول',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person, color: Colors.orange),
+            icon: Icon(Icons.account_circle, color: Colors.orange),
             label: 'پروفایل',
           ),
         ],
