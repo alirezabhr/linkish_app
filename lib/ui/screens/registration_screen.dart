@@ -30,8 +30,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   String _province = "";
   String _city = "";
   InstagramPageType? _pageType = InstagramPageType.general;
-  bool _isLoadingProvincesAndCities = false;
-  bool _isLoading = false;
+  bool _isRegisteringProvincesAndCities = false;
+  bool _isRegistering = false;
 
   List<Topic> _topicsList = [];
   List<Topic> _selectedTopicsList = [];
@@ -88,16 +88,67 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   Future<void> loadCities() async {
     setState(() {
-      _isLoadingProvincesAndCities = true;
+      _isRegisteringProvincesAndCities = true;
     });
     final String response =
         await rootBundle.loadString('assets/jsons/iran_cities.json');
     _provincesAndCities = await json.decode(response);
     setState(() {
-      _isLoadingProvincesAndCities = false;
+      _isRegisteringProvincesAndCities = false;
     });
     this._province = _provincesAndCities.first['name'];
     this._city = _provincesAndCities.first['cities'].first['name'];
+  }
+
+  void registerUser(String email) async {
+    bool isGeneralPage = _pageType == InstagramPageType.general ? true : false;
+    if (!isGeneralPage && _selectedTopicsList.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("هیچ محتوایی برای پیج خود انتخاب نکرده اید."),
+        ),
+      );
+    }
+
+    if (!_isRegistering) {
+      setState(() {
+        _isRegistering = true;
+      });
+      List<Topic> _finalTopics = [];
+      if (!isGeneralPage) {
+        _finalTopics = this._selectedTopicsList;
+      }
+
+      // bool isValidInstagram = await isValidPage(_igIdController.text);
+      // print("is valid page: $isValidInstagram");
+      bool isValidInstagram = true;
+      if (isValidInstagram) {
+        try {
+          Map data = {
+            "email": email,
+            "password": _passwordController.text,
+            "instagram_id": _igIdController.text,
+            "province": _province,
+            "city": _city,
+            "is_general_page": isGeneralPage,
+            "topics": _finalTopics,
+          };
+          Map response = await WebApi().influencerSignup(data);
+          influencer.setUserData(data);
+          influencer.setUserId(response["id"]);
+          influencer.setToken("jwt " + response["token"]);
+          influencer.registerUser();
+          Navigator.pushReplacementNamed(context, "/home");
+        } on DioError catch (e) {
+          print(e.response!
+              .data); // todo should add a validation, show the exception
+        }
+      }
+
+      setState(() {
+        _isRegistering = false;
+      });
+    }
   }
 
   @override
@@ -213,7 +264,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 16.0, vertical: 10.0),
-                  child: _isLoadingProvincesAndCities
+                  child: _isRegisteringProvincesAndCities
                       ? CircularProgressIndicator()
                       : LocationSelector(
                           _provincesAndCities, this.setProvinceAndCity),
@@ -272,59 +323,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         child: ElevatedButton(
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
-                              bool isGeneralPage =
-                                  _pageType == InstagramPageType.general
-                                      ? true
-                                      : false;
-                              if (!isGeneralPage && _selectedTopicsList.isEmpty) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                        "هیچ محتوایی برای پیج خود انتخاب نکرده اید."),
-                                  ),
-                                );
-                              }
-
-                              if (!_isLoading) {
-                                setState(() {
-                                  _isLoading = true;
-                                });
-
-                                // bool isValidInstagram = await isValidPage(_igIdController.text);
-                                // print("is valid page: $isValidInstagram");
-                                bool isValidInstagram = true;
-                                if (isValidInstagram) {
-                                  try {
-                                    Map data = {
-                                      "email": emailAddress,
-                                      "password": _passwordController.text,
-                                      "instagram_id": _igIdController.text,
-                                      "province": _province,
-                                      "city": _city,
-                                      "is_general_page": isGeneralPage,
-                                      "topics": this._selectedTopicsList,
-                                    };
-                                    Map response =
-                                        await WebApi().influencerSignup(data);
-                                    influencer.setUserData(data);
-                                    influencer.setUserId(response["id"]);
-                                    influencer.setToken("jwt " + response["token"]);
-                                    influencer.registerUser();
-                                    Navigator.pushReplacementNamed(
-                                        context, "/home");
-                                  } on DioError catch (e) {
-                                    print(e.response!
-                                        .data); // todo should add a validation, show the exception
-                                  }
-                                }
-
-                                setState(() {
-                                  _isLoading = false;
-                                });
+                              if (!_isRegistering) {
+                                registerUser(emailAddress);
                               }
                             }
                           },
-                          child: _isLoading
+                          child: _isRegistering
                               ? CircularProgressIndicator(
                                   color: Colors.white,
                                 )
@@ -337,7 +341,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     ),
                   ],
                 ),
-                SizedBox(height: 20,)
+                SizedBox(
+                  height: 20,
+                )
               ],
             ),
           ),
