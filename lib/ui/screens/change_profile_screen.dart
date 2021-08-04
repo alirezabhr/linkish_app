@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -76,6 +77,11 @@ class _ChangeProfileScreenState extends State<ChangeProfileScreen> {
           ? true
           : false;
 
+      List<Topic> _finalTopics = [];
+      if (!_isGeneralPage) {
+        _finalTopics = this._selectedTopicsList;
+      }
+
       if (!_isGeneralPage && _selectedTopicsList.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -88,11 +94,12 @@ class _ChangeProfileScreenState extends State<ChangeProfileScreen> {
 
       Map data = {
         "email": influencer.email,
-        "instagramId": influencer.instagramId,
+        "password": influencer.password,
+        "instagram_id": influencer.instagramId,
         "province": influencer.province,
         "city": influencer.city,
-        "isGeneralPage": _isGeneralPage,
-        "topics": this._selectedTopicsList,
+        "is_general_page": _isGeneralPage,
+        "topics": _finalTopics,
         "card_number": influencer.bankCardNo,
         "account_number": influencer.bankAccountNo,
       };
@@ -101,7 +108,13 @@ class _ChangeProfileScreenState extends State<ChangeProfileScreen> {
         await WebApi().updateUserAccount(influencer.userId, data);
         influencer.setUserData(data);
         await influencer.registerUser();
-      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("پروفایل جدید با موفقیت ثبت شد."),
+          ),
+        );
+      } on DioError catch (e) {
+        print(e.response!.data);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
