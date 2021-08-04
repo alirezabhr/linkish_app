@@ -223,6 +223,7 @@ class WebApi {
         (index) => influencer.topicsList[index].id);
     Map body = {
       "email": influencer.email,
+      "password": influencer.password,
       "instagram_id": influencer.instagramId,
       "province": influencer.province,
       "city": influencer.city,
@@ -280,10 +281,10 @@ class WebApi {
         data["topics"].length, (index) => data["topics"][index].id);
     Map body = {
       "email": data['email'],
-      "instagram_id": data['instagramId'],
+      "instagram_id": data['instagram_id'],
       "province": data['province'],
       "city": data['city'],
-      "is_general_page": data['isGeneralPage'],
+      "is_general_page": data['is_general_page'],
       "topics": topicsPk,
       "card_number": data['card_number'],
       "account_number": data['account_number'],
