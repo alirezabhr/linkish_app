@@ -17,6 +17,8 @@ class Influencer with ChangeNotifier {
   late String _city;
   late bool _isGeneralPage;
   late List<Topic> _topicsList;
+  String _bankCardNo = "";
+  String _bankAccountNo = "";
 
   int get userId => _userId;
 
@@ -38,6 +40,10 @@ class Influencer with ChangeNotifier {
 
   List<Topic> get topicsList => _topicsList;
 
+  String get bankCardNo => _bankCardNo;
+
+  String get bankAccountNo => _bankAccountNo;
+
   Future<void> getUserDataSharedPref() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _isRegistered = prefs.getBool("is_registered")!;
@@ -52,6 +58,8 @@ class Influencer with ChangeNotifier {
     String? topicsJson = prefs.getString("topics_json");
     List topicsMap = jsonDecode(topicsJson!);
     _topicsList = List.generate(topicsMap.length, (index) => Topic.mapToTopic(topicsMap[index]));
+    _bankCardNo = prefs.getString("bank_card_number")!;
+    _bankAccountNo = prefs.getString("bank_account_number")!;
   }
 
   Future<void> registerUser() async {
@@ -101,6 +109,20 @@ class Influencer with ChangeNotifier {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     this._password = password;
     _prefs.setString("password", password);
+    notifyListeners();
+  }
+
+  Future<void> setBankAccountNo(String bankAccountNumber) async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    this._bankAccountNo = bankAccountNumber;
+    _prefs.setString("bank_account_number", _bankAccountNo);
+    notifyListeners();
+  }
+
+  Future<void> setBankCardNo(String bankCardNumber) async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    this._bankCardNo = bankCardNumber;
+    _prefs.setString("bank_card_number", _bankCardNo);
     notifyListeners();
   }
 }
