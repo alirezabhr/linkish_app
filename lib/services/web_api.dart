@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:linkish/models/influencer.dart';
 
 import '../services/utils.dart';
 
@@ -7,6 +6,8 @@ import '../models/topic.dart';
 import '../models/ad.dart';
 import '../models/suggested_ad.dart';
 import '../models/influencer_ad.dart';
+import '../models/influencer.dart';
+import '../models/withdraw.dart';
 
 class WebApi {
   static final String baseUrl = "http://192.168.1.9:8000";
@@ -23,6 +24,7 @@ class WebApi {
   late final String _updateAccountUrl;
   late final String _changePasswordUrl;
   late final String _withdraw;
+  late final String _walletAmountUrl;
 
   WebApi() {
     this._obtainTokenUrl = this._baseUrl + "obtain-token/";
@@ -37,6 +39,7 @@ class WebApi {
     this._updateAccountUrl = this._baseUrl + "update/influencer/";
     this._changePasswordUrl = this._baseUrl + "change-pass/";
     this._withdraw = this._baseUrl + "withdraw/";
+    this._walletAmountUrl = this._baseUrl + "wallet/";
   }
 
   Future<String> obtainToken() async {
@@ -181,44 +184,10 @@ class WebApi {
     await dio.put(url, data: body);
   }
 
-  Future<List<InfluencerAd>> getWallet(int influencerPk) async {
-    Dio dio = Dio();
-    dio.options.headers["authorization"] = await getUserToken();
-    String url = this._walletUrl + influencerPk.toString() + "/";
-    Response response = await dio.get(url);
-
-    List<InfluencerAd> _walletList =
-        List.generate(response.data.length, (index) {
-      Map adMap = response.data[index]["influencer_ad"]["suggested_ad"]["ad"];
-      Ad ad = Ad(adMap["title"], adMap["base_link"], adMap["is_video"],
-          adMap["image"], []);
-      ad.id = adMap["id"];
-      ad.videoUrl = adMap["video"];
-
-      String _shortUrl = this._baseShortLink +
-          response.data[index]["influencer_ad"]["short_link"];
-      int _clicks = response.data[index]["influencer_ad"]["clicks"];
-      int _deduction = response.data[index]["influencer_ad"]["deduction"];
-      int _cpc = response.data[index]["influencer_ad"]["cpc"];
-      String _approvedAt = response.data[index]["influencer_ad"]["approved_at"];
-
-      InfluencerAd influencerAd = InfluencerAd(
-        _shortUrl,
-        _clicks,
-        _deduction,
-        _cpc,
-        _approvedAt,
-        ad,
-      );
-      return influencerAd;
-    });
-
-    return _walletList;
-  }
-
   Future<void> setBankAccount(
       Influencer influencer, String cardNo, String accountNo) async {
-    final String url = this._updateAccountUrl + influencer.userId.toString() + "/";
+    final String url =
+        this._updateAccountUrl + influencer.userId.toString() + "/";
     List<int> topicsPk = List.generate(influencer.topicsList.length,
         (index) => influencer.topicsList[index].id);
     Map body = {
@@ -294,6 +263,50 @@ class WebApi {
     await dio.put(url, data: body);
   }
 
+  Future<int> getWalletAmount(int userId) async {
+    final String url = this._walletAmountUrl + userId.toString() + "/";
+    Dio dio = Dio();
+    dio.options.headers["authorization"] = await getUserToken();
+
+    Response response = await dio.get(url);
+    return response.data['amount'];
+  }
+
+  Future<List<InfluencerAd>> getWalletIncome(int influencerPk) async {
+    Dio dio = Dio();
+    dio.options.headers["authorization"] = await getUserToken();
+    String url = this._walletUrl + influencerPk.toString() + "/";
+    Response response = await dio.get(url);
+
+    List<InfluencerAd> _walletList =
+        List.generate(response.data.length, (index) {
+      Map adMap = response.data[index]["influencer_ad"]["suggested_ad"]["ad"];
+      Ad ad = Ad(adMap["title"], adMap["base_link"], adMap["is_video"],
+          adMap["image"], []);
+      ad.id = adMap["id"];
+      ad.videoUrl = adMap["video"];
+
+      String _shortUrl = this._baseShortLink +
+          response.data[index]["influencer_ad"]["short_link"];
+      int _clicks = response.data[index]["influencer_ad"]["clicks"];
+      int _deduction = response.data[index]["influencer_ad"]["deduction"];
+      int _cpc = response.data[index]["influencer_ad"]["cpc"];
+      String _approvedAt = response.data[index]["influencer_ad"]["approved_at"];
+
+      InfluencerAd influencerAd = InfluencerAd(
+        _shortUrl,
+        _clicks,
+        _deduction,
+        _cpc,
+        _approvedAt,
+        ad,
+      );
+      return influencerAd;
+    });
+
+    return _walletList;
+  }
+
   Future<void> withdraw(int userId, int amount) async {
     final String url = this._withdraw + userId.toString() + "/";
     Dio dio = Dio();
@@ -305,12 +318,16 @@ class WebApi {
     await dio.post(url, data: data);
   }
 
-  Future<int> getWalletAmount(int userId) async {
+  Future<List<Withdraw>> getWithdrawsList(int userId) async {
     final String url = this._withdraw + userId.toString() + "/";
     Dio dio = Dio();
     dio.options.headers["authorization"] = await getUserToken();
 
     Response response = await dio.get(url);
-    return response.data['amount'];
+    List<Withdraw> list = List.generate(response.data.length, (index) {
+      Map item = response.data[index];
+      return Withdraw(item['amount'], item['is_paid'], item['is_rejected'], item['request_at']);
+    });
+    return list;
   }
 }
