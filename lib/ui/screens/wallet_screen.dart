@@ -31,6 +31,7 @@ class _WalletScreenState extends State<WalletScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("درخواست شما با موفقیت ثبت شد.")),
         );
+        await this.getWalletAmount();
       } on DioError {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
