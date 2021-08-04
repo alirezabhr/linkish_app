@@ -95,7 +95,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     horizontal: 8.0,
                   ),
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).pushNamed('/password');
+                    },
                     child: Row(
                       children: [
                         Icon(
