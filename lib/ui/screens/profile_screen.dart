@@ -19,7 +19,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Container(
       color: Colors.grey[200],
-      padding: const EdgeInsets.all(8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -39,7 +38,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 4.0,
+                    horizontal: 8.0,
+                  ),
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.of(context).pushNamed('/bank-account');
@@ -62,7 +64,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 4.0,
+                    horizontal: 8.0,
+                  ),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed('/change-profile');
+                    },
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.person,
+                          size: 36,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "تغییر پروفایل",
+                            style: TextStyle(fontSize: 18),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 4.0,
+                    horizontal: 8.0,
+                  ),
                   child: ElevatedButton(
                     onPressed: () {},
                     child: Row(
@@ -86,11 +117,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           Expanded(child: SizedBox()),
-          ElevatedButton(
+          TextButton(
             style: ElevatedButton.styleFrom(
-              primary: Colors.white,
-              shadowColor: Colors.white
-            ),
+                primary: Colors.white, shadowColor: Colors.white),
             onPressed: () {},
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
