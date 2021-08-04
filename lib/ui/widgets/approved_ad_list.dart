@@ -44,12 +44,12 @@ class _ApprovedAdListState extends State<ApprovedAdList> {
     });
     List<InfluencerAd> _list = [];
     try {
-      _list = await WebApi().getWallet(_userId);
+      _list = await WebApi().getWalletIncome(_userId);
     } on DioError catch (e) {
       if (e.response!.statusCode == 401) {
         String _newToken = await WebApi().obtainToken();
         _influencer.setToken(_newToken);
-        _list = await WebApi().getWallet(_userId);
+        _list = await WebApi().getWalletIncome(_userId);
       }
     }
     setState(() {
