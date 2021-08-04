@@ -23,10 +23,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: InstaDetails(influencer.instagramId),
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.all(8.0),
+          //   child: InstaDetails(influencer.instagramId),
+          // ),
           Container(
             padding: EdgeInsets.all(10.0),
             child: Column(
