@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/web_api.dart';
 import '../../services/utils.dart' as utils;
@@ -55,38 +54,15 @@ class _BankAccountScreenState extends State<BankAccountScreen> {
     }
   }
 
-  getBankAccount(int userId) async {
-    setState(() {
-      _isLoading = true;
-    });
-    Map data = await WebApi().getBankAccount(userId);
-
-    if (data['account_number']!="") {
-      this._accountNo = data['account_number'];
-    } else {
-      this._accountNo = "شماره شبا ثبت نشده است";
-    }
-
-    if (data['card_number']!="") {
-      this._cardNo = utils.addDashCardNo(data['card_number']);
-    } else {
-      this._cardNo = "شماره کارت ثبت نشده است";
-    }
-
-    setState(() {
-      _isLoading = false;
-    });
-  }
-
-  void setData() async {
-    SharedPreferences _prefs = await SharedPreferences.getInstance();
-    int? id = _prefs.getInt("id");
-    getBankAccount(id!);
+  void setData(Influencer influencer) {
+    this._accountNo = influencer.bankAccountNo;
+    this._cardNo = influencer.bankCardNo;
+    _cardNoController.text = _cardNo;
+    _accountNoController.text = _accountNo;
   }
 
   @override
   void initState() {
-    // setData();
     super.initState();
   }
 
@@ -96,17 +72,7 @@ class _BankAccountScreenState extends State<BankAccountScreen> {
     if (!_flag) {
       _flag = true;
       userId = influencer.userId;
-      if (influencer.bankAccountNo!="") {
-        this._accountNo = influencer.bankAccountNo;
-      } else {
-        this._accountNo = "شماره شبا ثبت نشده است";
-      }
-
-      if (influencer.bankCardNo!="") {
-        this._cardNo = utils.addDashCardNo(influencer.bankCardNo);
-      } else {
-        this._cardNo = "شماره کارت ثبت نشده است";
-      }
+      setData(influencer);
     }
     return Scaffold(
       appBar: AppBar(title: Text("تنظیمات حساب بانکی")),
@@ -120,24 +86,7 @@ class _BankAccountScreenState extends State<BankAccountScreen> {
                 )
               : Column(
                   children: [
-                    Row(
-                      children: [
-                        Text("شماره کارت: ", style: TextStyle(fontSize: 16),),
-                        Text(
-                          _cardNo,
-                          textDirection: TextDirection.ltr,
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Text("شماره شبا: ", style: TextStyle(fontSize: 16),),
-                        Text(
-                          _accountNo,
-                          textDirection: TextDirection.ltr,
-                        ),
-                      ],
-                    ),
+                    SizedBox(height: 40),
                     Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16.0,
