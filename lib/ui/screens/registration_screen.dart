@@ -133,32 +133,30 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       borderRadius: BorderRadius.circular(4),
                       // labelText: 'Password',
                     ),
-                    child: FittedBox(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "ایمیل:",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[700],
-                            ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "ایمیل:",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[700],
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: FittedBox(
-                              child: Text(
-                                emailAddress,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.grey[700],
-                                ),
-                                textDirection: TextDirection.ltr,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: FittedBox(
+                            child: Text(
+                              emailAddress,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey[700],
                               ),
+                              textDirection: TextDirection.ltr,
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
