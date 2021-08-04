@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:linkish/models/influencer.dart';
 
 import '../services/utils.dart';
 
@@ -8,8 +9,8 @@ import '../models/suggested_ad.dart';
 import '../models/influencer_ad.dart';
 
 class WebApi {
-  static final String baseUrl = "http://185.10.72.73";
-  final String _baseUrl = "http://185.10.72.73/";
+  static final String baseUrl = "http://192.168.1.9:8000";
+  final String _baseUrl = "http://192.168.1.9:8000/";
   late final String _obtainTokenUrl;
   late final String _emailUrl;
   late final String _otpUrl;
@@ -33,7 +34,7 @@ class WebApi {
     this._confirmAdUrl = this._baseUrl + "ad/inf/";
     this._baseShortLink = this._baseUrl + "ad/ia/";
     this._walletUrl = this._baseUrl + "ad/inf/wallet/";
-    this._updateAccountUrl = this._baseUrl + "influencer/";
+    this._updateAccountUrl = this._baseUrl + "update/influencer/";
     this._changePasswordUrl = this._baseUrl + "change-pass/";
     this._withdraw = this._baseUrl + "withdraw/";
   }
@@ -216,10 +217,17 @@ class WebApi {
   }
 
   Future<void> setBankAccount(
-      int userId, String cardNo, String accountNo) async {
-    final String url = this._updateAccountUrl + userId.toString() + "/";
+      Influencer influencer, String cardNo, String accountNo) async {
+    final String url = this._updateAccountUrl + influencer.userId.toString() + "/";
+    List<int> topicsPk = List.generate(influencer.topicsList.length,
+        (index) => influencer.topicsList[index].id);
     Map body = {
-      "pk": userId,
+      "email": influencer.email,
+      "instagram_id": influencer.instagramId,
+      "province": influencer.province,
+      "city": influencer.city,
+      "is_general_page": influencer.isGeneralPage,
+      "topics": topicsPk,
       "card_number": cardNo,
       "account_number": accountNo,
     };
@@ -266,6 +274,25 @@ class WebApi {
     await dio.put(url, data: data);
   }
 
+  Future<void> updateUserAccount(int userId, Map data) async {
+    final String url = this._updateAccountUrl + userId.toString() + "/";
+    List<int> topicsPk = List.generate(
+        data["topics"].length, (index) => data["topics"][index].id);
+    Map body = {
+      "email": data['email'],
+      "instagram_id": data['instagramId'],
+      "province": data['province'],
+      "city": data['city'],
+      "is_general_page": data['isGeneralPage'],
+      "topics": topicsPk,
+      "card_number": data['card_number'],
+      "account_number": data['account_number'],
+    };
+    Dio dio = Dio();
+    dio.options.headers["authorization"] = await getUserToken();
+    await dio.put(url, data: body);
+  }
+
   Future<void> withdraw(int userId, int amount) async {
     final String url = this._withdraw + userId.toString() + "/";
     Dio dio = Dio();
@@ -275,5 +302,14 @@ class WebApi {
       "amount": amount,
     };
     await dio.post(url, data: data);
+  }
+
+  Future<int> getWalletAmount(int userId) async {
+    final String url = this._withdraw + userId.toString() + "/";
+    Dio dio = Dio();
+    dio.options.headers["authorization"] = await getUserToken();
+
+    Response response = await dio.get(url);
+    return response.data['amount'];
   }
 }
