@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:linkish/models/influencer_ad.dart';
+import 'package:linkish/models/topic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 bool isActiveAd(InfluencerAd ad) {
@@ -50,6 +53,17 @@ Future<String?> getUserPassword() async {
   SharedPreferences _prefs = await SharedPreferences.getInstance();
   String? password = _prefs.getString("password");
   return password;
+}
+
+Future<List<Topic>> getUserTopics() async {
+  SharedPreferences _prefs = await SharedPreferences.getInstance();
+  String? topicsJson = _prefs.getString("topics_json");
+  List topicsMap = jsonDecode(topicsJson!);
+  List<Topic> topicList = List.generate(
+    topicsMap.length,
+    (index) => Topic.mapToTopic(topicsMap[index]),
+  );
+  return topicList;
 }
 
 String getCurrentDateTime() {
