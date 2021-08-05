@@ -17,12 +17,13 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   TextEditingController _bodyController = TextEditingController();
   bool _isSending = false;
 
-  Future<void> sendMsg(int userId, String title, String body) async {
+  Future<void> sendMsg(Influencer influencer, String title, String body) async {
     setState(() {
       _isSending = true;
     });
 
-    await WebApi().sendContactUsMessage(userId, title, body);
+    String userEmail = influencer.email;
+    await WebApi().sendContactUsMessage(userEmail, title, body);
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text("پیام شما با موفقیت ارسال شد."),
@@ -108,7 +109,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                     if (_formKey.currentState!.validate()) {
                       if (!_isSending) {
                         sendMsg(
-                          influencer.userId,
+                          influencer,
                           _titleController.text,
                           _bodyController.text,
                         );

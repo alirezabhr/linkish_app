@@ -333,13 +333,12 @@ class WebApi {
     return list;
   }
 
-  Future<void> sendContactUsMessage(int userId, String title, String body) async {
+  Future<void> sendContactUsMessage(String email, String title, String body) async {
     String url = this._contactUsUrl;
     Dio dio = Dio();
-    dio.options.headers["authorization"] = await getUserToken();
 
     Map data = {
-      'user_id': userId,
+      'email': email,
       'title': title,
       'body': body,
     };
