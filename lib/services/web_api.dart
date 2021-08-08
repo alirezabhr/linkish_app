@@ -10,8 +10,8 @@ import '../models/influencer.dart';
 import '../models/withdraw.dart';
 
 class WebApi {
-  static final String baseUrl = "https://ln6.ir";
-  final String _baseUrl = "https://ln6.ir/";
+  static final String baseUrl = "http://192.168.1.9:8000";
+  final String _baseUrl = "http://192.168.1.9:8000/";
   late final String _obtainTokenUrl;
   late final String _emailUrl;
   late final String _otpUrl;
@@ -111,7 +111,9 @@ class WebApi {
       Ad ad = Ad(adMap["title"], adMap["base_link"], adMap["is_video"],
           adMap["image"], []);
       ad.id = adMap["id"];
-      ad.videoUrl = adMap["video"];
+      if (ad.isVideo) {
+        ad.videoUrl = adMap["video"];
+      }
 
       int _id = response.data[index]["id"];
       bool _isApproved = response.data[index]["is_approved"];
@@ -136,7 +138,9 @@ class WebApi {
       Ad ad = Ad(adMap["title"], adMap["base_link"], adMap["is_video"],
           adMap["image"], []);
       ad.id = adMap["id"];
-      ad.videoUrl = adMap["video"];
+      if (ad.isVideo) {
+        ad.videoUrl = adMap["video"];
+      }
 
       String _shortUrl =
           this._baseShortLink + response.data[index]["short_link"] + "/";
@@ -286,7 +290,9 @@ class WebApi {
       Ad ad = Ad(adMap["title"], adMap["base_link"], adMap["is_video"],
           adMap["image"], []);
       ad.id = adMap["id"];
-      ad.videoUrl = adMap["video"];
+      if (ad.isVideo) {
+        ad.videoUrl = adMap["video"];
+      }
 
       String _shortUrl = this._baseShortLink +
           response.data[index]["influencer_ad"]["short_link"];
