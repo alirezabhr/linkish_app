@@ -43,7 +43,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       "برخی تبلیغات در لینکیش فقط برای نقطه جغرافیایی خاصی می‌باشد"
       " که اگر هماهنگ با داده‌های شما باشد،"
       " شانس شما برای شرکت در کمپین تبلیغاتی بالا می‌رود.";
-  final String _topicHelpText = "";
+  final String _topicHelpText = "وجود همخوانی بین موضوعات انتخاب شده محتوا و "
+      "پست‌های شما باعث افزایش استقبال از تبلیغ می‌گردد.";
 
   void appendItem(Topic value) {
     setState(() {
@@ -299,7 +300,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       },
                       icon: Icon(
                         Icons.lightbulb_outline,
-                        color: Colors.yellow,
+                        color: Colors.yellow[700],
                       ),
                     ),
                   ],
@@ -342,7 +343,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       setState(() {
                         _locType = value;
                         _province = _provincesAndCities.first['name'];
-                        _city = _provincesAndCities.first['cities'].first['name'];
+                        _city =
+                            _provincesAndCities.first['cities'].first['name'];
                       });
                     },
                   ),
@@ -387,7 +389,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       },
                       icon: Icon(
                         Icons.lightbulb_outline,
-                        color: Colors.yellow,
+                        color: Colors.yellow[700],
                       ),
                     ),
                   ],
