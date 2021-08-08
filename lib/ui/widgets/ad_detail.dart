@@ -6,8 +6,10 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:social_share/social_share.dart';
 
 import '../../models/influencer_ad.dart';
+import '../../models/ad.dart';
 import '../../services/web_api.dart';
 import '../../services/utils.dart' as utils;
 
@@ -23,6 +25,7 @@ class _AdDetailState extends State<AdDetail> {
   double progress = 0;
   bool _isDownloading = false;
   bool _isDownloaded = false;
+  late String _mediaPath;
 
   Future<bool> saveMedia(String url, String fileName) async {
     Directory directory;
@@ -31,7 +34,6 @@ class _AdDetailState extends State<AdDetail> {
         if (await _requestPermission(Permission.storage)) {
           directory = (await getExternalStorageDirectory())!;
           String newPath = "";
-          print(directory);
           List<String> paths = directory.path.split("/");
           for (int x = 1; x < paths.length; x++) {
             String folder = paths[x];
@@ -64,6 +66,7 @@ class _AdDetailState extends State<AdDetail> {
             progress = (value1 / value2) * 100;
           });
         });
+        this._mediaPath = saveFile.path;
         if (Platform.isIOS) {
           await ImageGallerySaver.saveFile(saveFile.path,
               isReturnPathOfIOS: true);
@@ -120,6 +123,15 @@ class _AdDetailState extends State<AdDetail> {
         content: Text('لینک کپی شد'),
       ),
     );
+  }
+
+  String getMediaUrl(Ad ad) {
+    String mediaUrl = ad.isVideo
+        ? ad.videoUrl
+        : ad.imageUrl;
+    mediaUrl = WebApi.baseUrl + mediaUrl;
+
+    return mediaUrl;
   }
 
   @override
@@ -187,10 +199,7 @@ class _AdDetailState extends State<AdDetail> {
                 ElevatedButton.icon(
                   icon: Icon(Icons.download_sharp),
                   onPressed: () async {
-                    String mediaUrl = widget.influencerAd.ad.isVideo
-                        ? widget.influencerAd.ad.videoUrl
-                        : widget.influencerAd.ad.imageUrl;
-                    mediaUrl = WebApi.baseUrl + mediaUrl;
+                    String mediaUrl = getMediaUrl(widget.influencerAd.ad);
                     await downloadFile(
                         mediaUrl, widget.influencerAd.ad.isVideo);
                   },
@@ -200,7 +209,20 @@ class _AdDetailState extends State<AdDetail> {
                 ElevatedButton.icon(
                   icon: Icon(Icons.share),
                   onPressed: () async {
+                    String mediaUrl = getMediaUrl(widget.influencerAd.ad);
+                    String newMediaName = utils.getCurrentDateTime();
+                    String format = widget.influencerAd.ad.isVideo ? ".mp4" : ".jpg";
 
+                    try {
+                      await this.saveMedia(mediaUrl, newMediaName + format);
+                      SocialShare.shareInstagramStory(_mediaPath, attributionURL: mediaUrl);
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('در حال حاضر امکان انتشار مستقیم به استوری وجود ندارد!'),
+                        ),
+                      );
+                    }
                   },
                   label: Text("استوری"),
                 ),
@@ -213,7 +235,7 @@ class _AdDetailState extends State<AdDetail> {
                   ? "با موفقیت دانلود شد"
                   : ""),
           Container(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.only(bottom: 8.0),
             child: Text(
               "زمان باقی مانده کمپین: " + remainingTime,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
