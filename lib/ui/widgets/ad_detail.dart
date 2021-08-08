@@ -131,10 +131,10 @@ class _AdDetailState extends State<AdDetail> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10.0),
+            padding: const EdgeInsets.only(top: 8.0, bottom: 4.0),
             child: Text(
               widget.influencerAd.ad.title,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
           Container(
@@ -196,6 +196,14 @@ class _AdDetailState extends State<AdDetail> {
                   },
                   label: Text("دانلود"),
                 ),
+                SizedBox(width: 16.0),
+                ElevatedButton.icon(
+                  icon: Icon(Icons.share),
+                  onPressed: () async {
+
+                  },
+                  label: Text("استوری"),
+                ),
               ],
             ),
           ),
@@ -205,10 +213,10 @@ class _AdDetailState extends State<AdDetail> {
                   ? "با موفقیت دانلود شد"
                   : ""),
           Container(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(8.0),
             child: Text(
               "زمان باقی مانده کمپین: " + remainingTime,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
         ],
