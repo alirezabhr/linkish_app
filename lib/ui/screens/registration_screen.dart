@@ -9,11 +9,13 @@ import 'package:flutter_insta/flutter_insta.dart';
 
 import '../widgets/location_selector.dart';
 import '../widgets/TopicSelector.dart';
+import '../widgets/custom_dialog.dart';
 import '../../models/topic.dart';
 import '../../models/influencer.dart';
 import '../../services/web_api.dart';
 
 enum InstagramPageType { general, pro }
+enum LocationType { all, specific }
 
 class RegistrationScreen extends StatefulWidget {
   @override
@@ -29,12 +31,20 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   late final List<dynamic> _provincesAndCities;
   String _province = "";
   String _city = "";
+  LocationType? _locType = LocationType.all;
   InstagramPageType? _pageType = InstagramPageType.general;
   bool _isRegisteringProvincesAndCities = false;
   bool _isRegistering = false;
 
   List<Topic> _topicsList = [];
   List<Topic> _selectedTopicsList = [];
+
+  final String _locationHelpText =
+      "برخی تبلیغات در لینکیش فقط برای نقطه جغرافیایی خاصی می‌باشد"
+      " که اگر هماهنگ با داده‌های شما باشد،"
+      " شانس شما برای شرکت در کمپین تبلیغاتی بالا می‌رود.";
+  final String _topicHelpText = "وجود همخوانی بین موضوعات انتخاب شده محتوا و "
+      "پست‌های شما باعث افزایش استقبال از تبلیغ می‌گردد.";
 
   void appendItem(Topic value) {
     setState(() {
@@ -101,6 +111,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 
   void registerUser(String email) async {
+    bool isAllLocations = _locType == LocationType.all ? true : false;
+    if (isAllLocations) {
+      this._province = "همه";
+      this._city = "همه";
+    }
+
     bool isGeneralPage = _pageType == InstagramPageType.general ? true : false;
     if (!isGeneralPage && _selectedTopicsList.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -261,13 +277,122 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     },
                   ),
                 ),
+                Divider(thickness: 1.0),
+                Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 16.0),
+                      child: Text(
+                        "موقعیت مکانی",
+                        style: TextStyle(
+                          fontSize: 15,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return RegistrationHelpDialog(_locationHelpText);
+                          },
+                        );
+                      },
+                      icon: Icon(
+                        Icons.lightbulb_outline,
+                        color: Colors.yellow[700],
+                      ),
+                    ),
+                  ],
+                ),
+                ListTile(
+                  title: Padding(
+                    padding: const EdgeInsets.only(left: 20.0),
+                    child: FittedBox(
+                      child: const Text('مخاطبین صفحه من همه مردم ایران هستند'),
+                    ),
+                  ),
+                  leading: Radio<LocationType>(
+                    value: LocationType.all,
+                    groupValue: _locType,
+                    onChanged: (LocationType? value) {
+                      setState(() {
+                        _locType = value;
+                      });
+                    },
+                  ),
+                  onTap: () {
+                    setState(() {
+                      _locType = LocationType.all;
+                      _province = 'همه';
+                      _city = 'همه';
+                    });
+                  },
+                ),
+                ListTile(
+                  title: Padding(
+                    padding: const EdgeInsets.only(left: 12.0),
+                    child: FittedBox(
+                      child: const Text('مخاطبین صفحه من در منطقه خاصی هستند'),
+                    ),
+                  ),
+                  leading: Radio<LocationType>(
+                    value: LocationType.specific,
+                    groupValue: _locType,
+                    onChanged: (LocationType? value) {
+                      setState(() {
+                        _locType = value;
+                        _province = _provincesAndCities.first['name'];
+                        _city =
+                            _provincesAndCities.first['cities'].first['name'];
+                      });
+                    },
+                  ),
+                  onTap: () {
+                    setState(() {
+                      _locType = LocationType.specific;
+                    });
+                  },
+                ),
                 Padding(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0, vertical: 10.0),
-                  child: _isRegisteringProvincesAndCities
-                      ? CircularProgressIndicator()
-                      : LocationSelector(
-                          _provincesAndCities, this.setProvinceAndCity),
+                      vertical: 2.0, horizontal: 16.0),
+                  child: _locType == LocationType.specific
+                      ? _isRegisteringProvincesAndCities
+                          ? CircularProgressIndicator()
+                          : LocationSelector(
+                              _provincesAndCities,
+                              this.setProvinceAndCity,
+                            )
+                      : null,
+                ),
+                Divider(thickness: 1.0),
+                Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 16.0),
+                      child: Text(
+                        "محتوای پیج",
+                        style: TextStyle(
+                          fontSize: 15,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return RegistrationHelpDialog(_topicHelpText);
+                          },
+                        );
+                      },
+                      icon: Icon(
+                        Icons.lightbulb_outline,
+                        color: Colors.yellow[700],
+                      ),
+                    ),
+                  ],
                 ),
                 ListTile(
                   title: const Text('محتوای پیج من عمومی است'),

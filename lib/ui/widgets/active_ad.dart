@@ -26,7 +26,7 @@ class WalletActiveAd extends StatelessWidget {
         title: Text(influencerAd.ad.title),
         trailing: Text(
           "درآمد: ${number * influencerAd.cpc}",
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green[600]),
         ),
         subtitle: Row(
           children: [

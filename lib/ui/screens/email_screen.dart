@@ -11,6 +11,7 @@ class EmailScreen extends StatefulWidget {
 class _EmailScreenState extends State<EmailScreen> {
   final TextEditingController _emailController = TextEditingController();
   bool _isLoading = false;
+  bool _isAcceptedTermAndCondition = true;
 
   @override
   Widget build(BuildContext context) {
@@ -19,73 +20,125 @@ class _EmailScreenState extends State<EmailScreen> {
         title: Text("ثبت نام لینکیش"),
       ),
       body: Container(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              height: 50,
-            ),
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-              child: Text(
-                "ایمیل خود را وارد نمایید:",
-                style: TextStyle(fontSize: 18),
-                textAlign: TextAlign.right,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 50,
               ),
-            ),
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-              child: TextField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'ایمیل',
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0, vertical: 10.0),
+                child: Text(
+                  "ایمیل خود را وارد نمایید:",
+                  style: TextStyle(fontSize: 18),
+                  textAlign: TextAlign.right,
                 ),
-                keyboardType: TextInputType.emailAddress,
-                textAlign: TextAlign.center,
-                textDirection: TextDirection.ltr,
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Container(
-                    padding: EdgeInsets.all(10),
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        if (!_isLoading) {
-                          setState(() {
-                            _isLoading = true;
-                          });
-                          try {
-                            await WebApi().sendEmail(_emailController.text);
-                            Navigator.pushReplacementNamed(context, "/verification",
-                                arguments: _emailController.text);
-                          } catch (exception) {
-                            print(exception); // todo should add a validation, show the exception
-                          }
-                          setState(() {
-                            _isLoading = false;
-                          });
-                        }
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0, vertical: 10.0),
+                child: TextField(
+                  controller: _emailController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'ایمیل',
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                  textAlign: TextAlign.center,
+                  textDirection: TextDirection.ltr,
+                ),
+              ),
+              Row(
+                children: [
+                  Checkbox(
+                    checkColor: Colors.white,
+                    value: _isAcceptedTermAndCondition,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        _isAcceptedTermAndCondition = value!;
+                      });
+                    },
+                  ),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pushNamed("/terms-conditions");
                       },
-                      child: _isLoading
-                          ? CircularProgressIndicator(color: Colors.white,)
-                          : Text(
-                              "ادامه",
-                              style: TextStyle(fontSize: 16),
-                            ),
+                      child: Text(
+                        'شرایط و ضوابط',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      )),
+                  Text("را میپذیرم"),
+                ],
+              ),
+              SizedBox(
+                height: 50,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          if (!_isAcceptedTermAndCondition) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content:
+                                    Text("شرایط و ضوابط را تایید نکرده‌اید"),
+                              ),
+                            );
+                          } else {
+                            if (!_isLoading) {
+                              setState(() {
+                                _isLoading = true;
+                              });
+                              try {
+                                await WebApi().sendEmail(_emailController.text);
+                                Navigator.pushReplacementNamed(
+                                    context, "/verification",
+                                    arguments: _emailController.text);
+                              } catch (exception) {
+                                // todo should add a validation, show the exception
+                                print(exception);
+                              }
+                              setState(() {
+                                _isLoading = false;
+                              });
+                            }
+                          }
+                        },
+                        child: _isLoading
+                            ? CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : Text(
+                                "ادامه",
+                                style: TextStyle(fontSize: 16),
+                              ),
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            Expanded(child: SizedBox()),
-          ],
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('قبلا ثبت نام کرده‌اید؟ '),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pushReplacementNamed('/login');
+                    },
+                    child: Text('ورود'),
+                  ),
+                  SizedBox(width: 20),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -13,6 +13,7 @@ class WebApi {
   static final String baseUrl = "https://ln6.ir";
   final String _baseUrl = "https://ln6.ir/";
   late final String _obtainTokenUrl;
+  late final String _influencerLogin;
   late final String _emailUrl;
   late final String _otpUrl;
   late final String _topicsUrl;
@@ -29,6 +30,7 @@ class WebApi {
 
   WebApi() {
     this._obtainTokenUrl = this._baseUrl + "obtain-token/";
+    this._influencerLogin = this._baseUrl + "login/influencer/";
     this._emailUrl = this._baseUrl + "send-email/";
     this._otpUrl = this._baseUrl + "check-otp/";
     this._topicsUrl = this._baseUrl + "topic/";
@@ -55,6 +57,15 @@ class WebApi {
     Response response = await Dio().post(this._obtainTokenUrl, data: data);
     String newToken = "jwt " + response.data["token"];
     return newToken;
+  }
+
+  Future<Map> influencerLogin(String email, String password) async {
+    Map data = {
+      "email": email,
+      "password": password,
+    };
+    Response response = await Dio().post(this._influencerLogin, data: data);
+    return response.data;
   }
 
   Future<void> sendEmail(String email) async {
@@ -111,7 +122,9 @@ class WebApi {
       Ad ad = Ad(adMap["title"], adMap["base_link"], adMap["is_video"],
           adMap["image"], []);
       ad.id = adMap["id"];
-      ad.videoUrl = adMap["video"];
+      if (ad.isVideo) {
+        ad.videoUrl = adMap["video"];
+      }
 
       int _id = response.data[index]["id"];
       bool _isApproved = response.data[index]["is_approved"];
@@ -136,7 +149,9 @@ class WebApi {
       Ad ad = Ad(adMap["title"], adMap["base_link"], adMap["is_video"],
           adMap["image"], []);
       ad.id = adMap["id"];
-      ad.videoUrl = adMap["video"];
+      if (ad.isVideo) {
+        ad.videoUrl = adMap["video"];
+      }
 
       String _shortUrl =
           this._baseShortLink + response.data[index]["short_link"] + "/";
@@ -286,7 +301,9 @@ class WebApi {
       Ad ad = Ad(adMap["title"], adMap["base_link"], adMap["is_video"],
           adMap["image"], []);
       ad.id = adMap["id"];
-      ad.videoUrl = adMap["video"];
+      if (ad.isVideo) {
+        ad.videoUrl = adMap["video"];
+      }
 
       String _shortUrl = this._baseShortLink +
           response.data[index]["influencer_ad"]["short_link"];
@@ -333,13 +350,12 @@ class WebApi {
     return list;
   }
 
-  Future<void> sendContactUsMessage(int userId, String title, String body) async {
+  Future<void> sendContactUsMessage(String email, String title, String body) async {
     String url = this._contactUsUrl;
     Dio dio = Dio();
-    dio.options.headers["authorization"] = await getUserToken();
 
     Map data = {
-      'user_id': userId,
+      'email': email,
       'title': title,
       'body': body,
     };

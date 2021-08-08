@@ -35,12 +35,6 @@ class _LocationSelectorState extends State<LocationSelector> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "موقعیت مکانی",
-            style: TextStyle(
-              fontSize: 15,
-            ),
-          ),
           Row(
             children: [
               Padding(

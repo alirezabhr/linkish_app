@@ -138,13 +138,7 @@ class _AdRowState extends State<AdRow> {
       child: _isLoading
           ? Center(child: CircularProgressIndicator())
           : _hasActiveAd
-              ? SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      AdDetail(this._activeAd),
-                    ],
-                  ),
-                )
+              ? SingleChildScrollView(child: AdDetail(this._activeAd))
               : _suggestedAdsList.isEmpty
                   ? Center(
                       child: FittedBox(

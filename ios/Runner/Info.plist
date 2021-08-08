@@ -50,5 +50,8 @@
 
 	<key>NSPhotoLibraryUsageDescription</key>
     <string>This app need to use photos.</string>
+
+    <key>LSApplicationQueriesSchemes</key>
+    <string>instagram-stories</string>
 </dict>
 </plist>
