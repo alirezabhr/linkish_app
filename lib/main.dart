@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'models/influencer.dart';
 
 import 'ui/screens/welcome_screen.dart';
+import 'ui/screens/login_screen.dart';
 import 'ui/screens/email_screen.dart';
 import 'ui/screens/verification_screen.dart';
 import 'ui/screens/registration_screen.dart';
@@ -35,7 +36,7 @@ class MyApp extends StatelessWidget {
             child: child!,
           );
         },
-        home: WelcomeScreen(),
+        home: LoginScreen(),
         routes: {
           '/welcome': (ctx) => WelcomeScreen(),
           '/email': (ctx) => EmailScreen(),
@@ -46,6 +47,7 @@ class MyApp extends StatelessWidget {
           '/password': (ctx) => PassWordScreen(),
           '/change-profile': (ctx) => ChangeProfileScreen(),
           '/contact-us': (ctx) => ContactUsScreen(),
+          '/login': (ctx) => LoginScreen(),
         },
       ),
     );
