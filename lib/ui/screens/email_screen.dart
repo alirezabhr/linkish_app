@@ -19,73 +19,91 @@ class _EmailScreenState extends State<EmailScreen> {
         title: Text("ثبت نام لینکیش"),
       ),
       body: Container(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              height: 50,
-            ),
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-              child: Text(
-                "ایمیل خود را وارد نمایید:",
-                style: TextStyle(fontSize: 18),
-                textAlign: TextAlign.right,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 50,
               ),
-            ),
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-              child: TextField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'ایمیل',
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0, vertical: 10.0),
+                child: Text(
+                  "ایمیل خود را وارد نمایید:",
+                  style: TextStyle(fontSize: 18),
+                  textAlign: TextAlign.right,
                 ),
-                keyboardType: TextInputType.emailAddress,
-                textAlign: TextAlign.center,
-                textDirection: TextDirection.ltr,
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Container(
-                    padding: EdgeInsets.all(10),
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        if (!_isLoading) {
-                          setState(() {
-                            _isLoading = true;
-                          });
-                          try {
-                            await WebApi().sendEmail(_emailController.text);
-                            Navigator.pushReplacementNamed(context, "/verification",
-                                arguments: _emailController.text);
-                          } catch (exception) {
-                            print(exception); // todo should add a validation, show the exception
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0, vertical: 10.0),
+                child: TextField(
+                  controller: _emailController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'ایمیل',
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                  textAlign: TextAlign.center,
+                  textDirection: TextDirection.ltr,
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          if (!_isLoading) {
+                            setState(() {
+                              _isLoading = true;
+                            });
+                            try {
+                              await WebApi().sendEmail(_emailController.text);
+                              Navigator.pushReplacementNamed(
+                                  context, "/verification",
+                                  arguments: _emailController.text);
+                            } catch (exception) {
+                              print(
+                                  exception); // todo should add a validation, show the exception
+                            }
+                            setState(() {
+                              _isLoading = false;
+                            });
                           }
-                          setState(() {
-                            _isLoading = false;
-                          });
-                        }
-                      },
-                      child: _isLoading
-                          ? CircularProgressIndicator(color: Colors.white,)
-                          : Text(
-                              "ادامه",
-                              style: TextStyle(fontSize: 16),
-                            ),
+                        },
+                        child: _isLoading
+                            ? CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : Text(
+                                "ادامه",
+                                style: TextStyle(fontSize: 16),
+                              ),
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            Expanded(child: SizedBox()),
-          ],
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('قبلا ثبت نام کرده‌اید؟ '),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pushReplacementNamed('/login');
+                    },
+                    child: Text('ورود'),
+                  ),
+                  SizedBox(width: 20),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
