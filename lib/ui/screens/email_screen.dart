@@ -11,6 +11,7 @@ class EmailScreen extends StatefulWidget {
 class _EmailScreenState extends State<EmailScreen> {
   final TextEditingController _emailController = TextEditingController();
   bool _isLoading = false;
+  bool _isAcceptedTermAndCondition = true;
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +52,31 @@ class _EmailScreenState extends State<EmailScreen> {
                 ),
               ),
               Row(
+                children: [
+                  Checkbox(
+                    checkColor: Colors.white,
+                    value: _isAcceptedTermAndCondition,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        _isAcceptedTermAndCondition = value!;
+                      });
+                    },
+                  ),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pushNamed("/terms-conditions");
+                      },
+                      child: Text(
+                        'شرایط و ضوابط',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      )),
+                  Text("را میپذیرم"),
+                ],
+              ),
+              SizedBox(
+                height: 50,
+              ),
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Expanded(
@@ -58,22 +84,31 @@ class _EmailScreenState extends State<EmailScreen> {
                       padding: EdgeInsets.all(10),
                       child: ElevatedButton(
                         onPressed: () async {
-                          if (!_isLoading) {
-                            setState(() {
-                              _isLoading = true;
-                            });
-                            try {
-                              await WebApi().sendEmail(_emailController.text);
-                              Navigator.pushReplacementNamed(
-                                  context, "/verification",
-                                  arguments: _emailController.text);
-                            } catch (exception) {
-                              print(
-                                  exception); // todo should add a validation, show the exception
+                          if (!_isAcceptedTermAndCondition) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content:
+                                    Text("شرایط و ضوابط را تایید نکرده‌اید"),
+                              ),
+                            );
+                          } else {
+                            if (!_isLoading) {
+                              setState(() {
+                                _isLoading = true;
+                              });
+                              try {
+                                await WebApi().sendEmail(_emailController.text);
+                                Navigator.pushReplacementNamed(
+                                    context, "/verification",
+                                    arguments: _emailController.text);
+                              } catch (exception) {
+                                // todo should add a validation, show the exception
+                                print(exception);
+                              }
+                              setState(() {
+                                _isLoading = false;
+                              });
                             }
-                            setState(() {
-                              _isLoading = false;
-                            });
                           }
                         },
                         child: _isLoading

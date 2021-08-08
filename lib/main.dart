@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:linkish/ui/screens/terms_condtions_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'models/influencer.dart';
@@ -39,6 +40,7 @@ class MyApp extends StatelessWidget {
         home: WelcomeScreen(),
         routes: {
           '/welcome': (ctx) => WelcomeScreen(),
+          '/terms-conditions': (ctx) => TermsConditionsScreen(),
           '/email': (ctx) => EmailScreen(),
           '/verification': (ctx) => VerificationScreen(),
           '/registration': (ctx) => RegistrationScreen(),
