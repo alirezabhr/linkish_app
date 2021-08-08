@@ -146,7 +146,7 @@ class _AdDetailState extends State<AdDetail> {
             padding: const EdgeInsets.only(top: 8.0, bottom: 4.0),
             child: Text(
               widget.influencerAd.ad.title,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
           Container(
