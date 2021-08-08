@@ -149,7 +149,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           TextButton(
             style: ElevatedButton.styleFrom(
                 primary: Colors.white, shadowColor: Colors.white),
-            onPressed: () {},
+            onPressed: () {
+              influencer.changeIsRegisteredValue(false);
+              Navigator.pushReplacementNamed(context, '/login');
+            },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
