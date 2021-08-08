@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/topic.dart';
+import '../services/web_api.dart';
 
 class Influencer with ChangeNotifier {
   late int _userId;
@@ -89,6 +90,33 @@ class Influencer with ChangeNotifier {
     this._isGeneralPage = data['is_general_page'];
     this._topicsList = data['topics'];
     notifyListeners();
+  }
+
+  Future<void> logUserIn(Map userData, String password) async {
+    if (userData['card_number'] != null) {
+      this.setBankCardNo(userData['card_number']);
+    }
+    if (userData['account_number'] != null) {
+      this.setBankAccountNo(userData['account_number']);
+    }
+
+    List userTopicsId = userData['topics'];
+    List<Topic> userTopics = [];
+
+
+    if (userTopicsId.isNotEmpty) {
+      List<Topic> allTopics = await WebApi().getTopicsList();
+      for (var topicId in userTopicsId) {
+        Topic tmpTopic = allTopics.firstWhere((element) => element.id == topicId);
+        userTopics.add(tmpTopic);
+      }
+    }
+
+    userData['topics'] = userTopics;
+    userData['password'] = password;
+
+    this.setUserData(userData);
+    this.registerUser();
   }
 
   Future<void> setToken(String token) async {
