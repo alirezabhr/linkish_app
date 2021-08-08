@@ -29,8 +29,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   bool _obscurePassword = true;
   final _igIdController = TextEditingController();
   late final List<dynamic> _provincesAndCities;
-  String _province = "همه";
-  String _city = "همه";
+  String _province = "";
+  String _city = "";
   LocationType? _locType = LocationType.all;
   InstagramPageType? _pageType = InstagramPageType.general;
   bool _isRegisteringProvincesAndCities = false;
@@ -39,7 +39,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   List<Topic> _topicsList = [];
   List<Topic> _selectedTopicsList = [];
 
-  final String _locationHelpText = "برخی تبلیغات در لینکیش فقط برای نقطه جغرافیایی خاصی می‌باشد"
+  final String _locationHelpText =
+      "برخی تبلیغات در لینکیش فقط برای نقطه جغرافیایی خاصی می‌باشد"
       " که اگر هماهنگ با داده‌های شما باشد،"
       " شانس شما برای شرکت در کمپین تبلیغاتی بالا می‌رود.";
   final String _topicHelpText = "";
@@ -109,6 +110,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 
   void registerUser(String email) async {
+    bool isAllLocations = _locType == LocationType.all ? true : false;
+    if (isAllLocations) {
+      this._province = "همه";
+      this._city = "همه";
+    }
+
     bool isGeneralPage = _pageType == InstagramPageType.general ? true : false;
     if (!isGeneralPage && _selectedTopicsList.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -169,8 +176,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   @override
   Widget build(BuildContext context) {
     influencer = Provider.of<Influencer>(context);
-    // String emailAddress = ModalRoute.of(context)!.settings.arguments as String;
-    String emailAddress = 'alireza@bhr';
+    String emailAddress = ModalRoute.of(context)!.settings.arguments as String;
     return Scaffold(
       appBar: AppBar(
         title: Text("ثبت نام لینکیش"),
@@ -299,9 +305,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   ],
                 ),
                 ListTile(
-                  title: Expanded(
-                      child:
-                          const Text('مخاطبین صفحه من همه مردم ایران هستند')),
+                  title: Padding(
+                    padding: const EdgeInsets.only(left: 20.0),
+                    child: FittedBox(
+                      child: const Text('مخاطبین صفحه من همه مردم ایران هستند'),
+                    ),
+                  ),
                   leading: Radio<LocationType>(
                     value: LocationType.all,
                     groupValue: _locType,
@@ -320,14 +329,20 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   },
                 ),
                 ListTile(
-                  title: Expanded(
-                      child: const Text('مخاطبین صفحه من در منطقه خاصی هستند')),
+                  title: Padding(
+                    padding: const EdgeInsets.only(left: 12.0),
+                    child: FittedBox(
+                      child: const Text('مخاطبین صفحه من در منطقه خاصی هستند'),
+                    ),
+                  ),
                   leading: Radio<LocationType>(
                     value: LocationType.specific,
                     groupValue: _locType,
                     onChanged: (LocationType? value) {
                       setState(() {
                         _locType = value;
+                        _province = _provincesAndCities.first['name'];
+                        _city = _provincesAndCities.first['cities'].first['name'];
                       });
                     },
                   ),
