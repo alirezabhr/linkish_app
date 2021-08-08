@@ -153,4 +153,11 @@ class Influencer with ChangeNotifier {
     _prefs.setString("bank_card_number", _bankCardNo);
     notifyListeners();
   }
+
+  Future<void> changeIsRegisteredValue(bool isRegistered) async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    this._isRegistered = isRegistered;
+    _prefs.setBool("is_registered", isRegistered);
+    notifyListeners();
+  }
 }
