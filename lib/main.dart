@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
             child: child!,
           );
         },
-        home: LoginScreen(),
+        home: WelcomeScreen(),
         routes: {
           '/welcome': (ctx) => WelcomeScreen(),
           '/email': (ctx) => EmailScreen(),
