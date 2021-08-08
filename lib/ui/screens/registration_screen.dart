@@ -9,11 +9,13 @@ import 'package:flutter_insta/flutter_insta.dart';
 
 import '../widgets/location_selector.dart';
 import '../widgets/TopicSelector.dart';
+import '../widgets/custom_dialog.dart';
 import '../../models/topic.dart';
 import '../../models/influencer.dart';
 import '../../services/web_api.dart';
 
 enum InstagramPageType { general, pro }
+enum LocationType { all, specific }
 
 class RegistrationScreen extends StatefulWidget {
   @override
@@ -27,14 +29,20 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   bool _obscurePassword = true;
   final _igIdController = TextEditingController();
   late final List<dynamic> _provincesAndCities;
-  String _province = "";
-  String _city = "";
+  String _province = "همه";
+  String _city = "همه";
+  LocationType? _locType = LocationType.all;
   InstagramPageType? _pageType = InstagramPageType.general;
   bool _isRegisteringProvincesAndCities = false;
   bool _isRegistering = false;
 
   List<Topic> _topicsList = [];
   List<Topic> _selectedTopicsList = [];
+
+  final String _locationHelpText = "برخی تبلیغات در لینکیش فقط برای نقطه جغرافیایی خاصی می‌باشد"
+      " که اگر هماهنگ با داده‌های شما باشد،"
+      " شانس شما برای شرکت در کمپین تبلیغاتی بالا می‌رود.";
+  final String _topicHelpText = "";
 
   void appendItem(Topic value) {
     setState(() {
@@ -161,7 +169,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   @override
   Widget build(BuildContext context) {
     influencer = Provider.of<Influencer>(context);
-    String emailAddress = ModalRoute.of(context)!.settings.arguments as String;
+    // String emailAddress = ModalRoute.of(context)!.settings.arguments as String;
+    String emailAddress = 'alireza@bhr';
     return Scaffold(
       appBar: AppBar(
         title: Text("ثبت نام لینکیش"),
@@ -261,13 +270,112 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     },
                   ),
                 ),
+                Divider(thickness: 1.0),
+                Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 16.0),
+                      child: Text(
+                        "موقعیت مکانی",
+                        style: TextStyle(
+                          fontSize: 15,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return RegistrationHelpDialog(_locationHelpText);
+                          },
+                        );
+                      },
+                      icon: Icon(
+                        Icons.lightbulb_outline,
+                        color: Colors.yellow,
+                      ),
+                    ),
+                  ],
+                ),
+                ListTile(
+                  title: Expanded(
+                      child:
+                          const Text('مخاطبین صفحه من همه مردم ایران هستند')),
+                  leading: Radio<LocationType>(
+                    value: LocationType.all,
+                    groupValue: _locType,
+                    onChanged: (LocationType? value) {
+                      setState(() {
+                        _locType = value;
+                      });
+                    },
+                  ),
+                  onTap: () {
+                    setState(() {
+                      _locType = LocationType.all;
+                      _province = 'همه';
+                      _city = 'همه';
+                    });
+                  },
+                ),
+                ListTile(
+                  title: Expanded(
+                      child: const Text('مخاطبین صفحه من در منطقه خاصی هستند')),
+                  leading: Radio<LocationType>(
+                    value: LocationType.specific,
+                    groupValue: _locType,
+                    onChanged: (LocationType? value) {
+                      setState(() {
+                        _locType = value;
+                      });
+                    },
+                  ),
+                  onTap: () {
+                    setState(() {
+                      _locType = LocationType.specific;
+                    });
+                  },
+                ),
                 Padding(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0, vertical: 10.0),
-                  child: _isRegisteringProvincesAndCities
-                      ? CircularProgressIndicator()
-                      : LocationSelector(
-                          _provincesAndCities, this.setProvinceAndCity),
+                      vertical: 2.0, horizontal: 16.0),
+                  child: _locType == LocationType.specific
+                      ? _isRegisteringProvincesAndCities
+                          ? CircularProgressIndicator()
+                          : LocationSelector(
+                              _provincesAndCities,
+                              this.setProvinceAndCity,
+                            )
+                      : null,
+                ),
+                Divider(thickness: 1.0),
+                Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 16.0),
+                      child: Text(
+                        "محتوای پیج",
+                        style: TextStyle(
+                          fontSize: 15,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return RegistrationHelpDialog(_topicHelpText);
+                          },
+                        );
+                      },
+                      icon: Icon(
+                        Icons.lightbulb_outline,
+                        color: Colors.yellow,
+                      ),
+                    ),
+                  ],
                 ),
                 ListTile(
                   title: const Text('محتوای پیج من عمومی است'),
