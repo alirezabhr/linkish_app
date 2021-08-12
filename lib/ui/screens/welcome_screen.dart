@@ -7,7 +7,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../models/influencer.dart';
 
-
 class WelcomeScreen extends StatefulWidget {
   @override
   _WelcomeScreenState createState() => _WelcomeScreenState();
@@ -35,8 +34,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   void startTimer() {
     _timer = new Timer.periodic(
       Duration(seconds: 1),
-          (Timer timer) => setState(
-            () {
+      (Timer timer) => setState(
+        () {
           if (_progress == 0) {
             _timer.cancel();
             _loadData();
@@ -136,10 +135,11 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         thickness: 1.5,
                       ),
                       Center(
-                          child: Text(
-                            'نسخه 1.3.0',
-                            textAlign: TextAlign.center,
-                          )),
+                        child: Text(
+                          'نسخه 1.3.1',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
                     ],
                   ),
                 ),
