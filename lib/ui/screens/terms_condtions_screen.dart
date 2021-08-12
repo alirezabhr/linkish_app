@@ -105,6 +105,137 @@ class TermsConditionsScreen extends StatelessWidget {
                   ),
                 ),
               ),
+              SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.only(top: 18.0, right: 8.0, bottom: 8.0),
+                child: Text(
+                  'قوانین و شرایط استفاده از برنامه',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20.0,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Text("تبلیغات ارسالی با توجه به مشخصات پروفایل شما برایتان ارسال می‌گردد"
+                    " که محتوای تبلیغاتی لینکیش همخوانی بیشتری با پیج اینستاگرام شما داشته باشد."
+                    " با این وجود بعد از پیشنهاد آگهی برای شما که با ایمیل نیز "
+                    "به شما اطلاع داده می‌شود در صفحه خانه شما سه گزینه انتخاب دارید.",
+                  style: TextStyle(
+                      fontSize: 15.0
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 18.0, right: 8.0),
+                child: Text(
+                  'ورود به کمپین',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16.0,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Text( "با زدن این دکمه شما می‌پذیرید که وارد این کمپین تبلیغاتی شوید و "
+                    "محتوای تبلیغاتی آماده دانلود و قرارگیری بر روی اکانت اینستاگرام شما "
+                    "به صورت استوری (story) می‌باشد. لینک مربوط به هر تبلیغ به طور خاص برای شما تولید می‌شود"
+                    " که به منظور swipe up باید لینک به همراه محتوای تبلیغاتی در استوری شما قرار گیرد."
+                    "\nتوجه: زمان هر کمپین تبلیغاتی 24 ساعت می‌باشد که معادل مدت زمان استوری اینستاگرام است"
+                    " و لینک تبلیغاتی بعد از 24 ساعت غیرفعال می‌شود.",
+                  style: TextStyle(
+                      fontSize: 15.0
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 18.0, right: 8.0),
+                child: Text(
+                  'رد کردن کمپین',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16.0,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Text( "در صورت نا همخوان بودن محتوای تبلیغ با محتوای صفحه شما و "
+                    "یا به هر دلیل دیگر شما می‌توانید از شرکت در این کمپین تبلیغاتی صرف نظر کنید.",
+                  style: TextStyle(
+                      fontSize: 15.0
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 18.0, right: 8.0),
+                child: Text(
+                  'گزارش کردن آگهی',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16.0,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Text( "هرچند عوامل اجرایی و تیم لینکیش تابع قوانین و ضوابط جمهوری اسلامی ایران هستند، "
+                    "درصورتی که شما متوجه شدید آگهی ارسالی برای شما با مضامین سیاسی و "
+                    "یا غیر اخلاقی یا موارد دیگر است می‌توانید با زدن این دکمه آگهی مربوطه را گزارش کنید.",
+                  style: TextStyle(
+                      fontSize: 15.0
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 18.0, right: 8.0),
+                child: Text(
+                  'روش کسب درآمد',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16.0,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Text( "پس از ورود به کمپین و قرار دادن لینک و محتوای مربوطه در استوری اینستاگرام خود،"
+                    " شما شروع به کسب درآمد با لینکیش کرده‌اید. بدین صورت که فالوئر‌های شما"
+                    " با کلیک بر لینک موجود در استوری به سایت اصلی آگهی ارجاع داده می‌شوند. به عبارت دیگر "
+                    "به ازای هر کلیک بر روی لینک شما کسب درآمد می‌کنید. این درآمد در کیف پول شما در "
+                    "لینکیش بطور خودکار واریز می‌شود.\nتوجه داشته باشید که لینکیش با کمک هوش مصنوعی برخی از کلیک ها "
+                    "را حساب نمی‌کند و یا جلوی تقلب ها را می‌گیرد. "
+                    "بطور مثال اگر کسی چندین بار بر روی لینک کلیک کند فقط یکبار برای او شمارش می‌شود.",
+                  style: TextStyle(
+                      fontSize: 15.0
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 18.0, right: 8.0),
+                child: Text(
+                  'دریافت وجه',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16.0,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Text( "دریافت وجه به صورت کارت به کارت یا پایا برای شما انجام می‌شود به همین علت شماره "
+                    "شبا و شماره کارت بانکی شما لازم می‌باشد. محدودیت‌هایی در روزهای "
+                    "اول کسب و کار خواهیم داشت؛ بطور مثال در حداقل میزان دریافت وجه نقد که با تسهیل روند "
+                    "اتوماسیون بانکی و مجوز بانکی این محدودیت برطرف خواهد شد."
+                    "\nحداقل موجودی کیف پول شما باید یک میلیون ریال "
+                    "یا معادل صدهزار تومان باشد تا بتوانید درخواست خود را برای دریافت وجه ثبت کنید.",
+                  style: TextStyle(
+                      fontSize: 15.0
+                  ),
+                ),
+              ),
             ],
           ),
         ),

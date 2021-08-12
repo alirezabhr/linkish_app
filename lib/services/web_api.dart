@@ -361,4 +361,17 @@ class WebApi {
     };
     await dio.post(url, data: data);
   }
+
+  Future<String> getOnce(String title) async {
+    String url = this._baseUrl + "once/";
+    Map data = {
+      'title': title,
+    };
+    Response response = await Dio().post(url, data: data);
+    String body = "";
+    if (response.data['body'] != null) {
+      body = response.data['body'];
+    }
+    return body;
+  }
 }
