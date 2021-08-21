@@ -116,6 +116,12 @@ class WebApi {
       "city": data['city'],
       "is_general_page": data['is_general_page'],
       "topics": topicsPk,
+      "followers": data['followers'],
+      "is_business_page": data['is_business_page'],
+      "is_professional_page": data['is_professional_page'],
+      "page_category_enum": data['page_category_enum'],
+      "page_category_name": data['page_category_name'],
+      "os": data['os'],
     };
     Response response = await Dio().post(this._influencerSignUpUrl, data: body);
     return response.data;

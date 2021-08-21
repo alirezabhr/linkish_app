@@ -19,14 +19,15 @@ class _EmailScreenState extends State<EmailScreen> {
   bool _isAcceptedTermAndCondition = true;
 
   Future<void> checkIgIdAndSendEmail() async {
+    Map instagramResponse;
     bool _isValid = true;
     setState(() {
       _isCheckingIgId = true;
     });
 
     try {
-      Map response = await WebApi().checkInstagramId(_igIdController.text);
-      if (response['followers'] < 10000) {
+      instagramResponse = await WebApi().checkInstagramId(_igIdController.text);
+      if (instagramResponse['followers'] < 10000) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("اینستاگرام شما کمتر از ده هزار دنبال کننده دارد."),
@@ -80,6 +81,11 @@ class _EmailScreenState extends State<EmailScreen> {
       Map routeData = {
         'email': _emailController.text,
         'instagram_id': _igIdController.text,
+        "followers": instagramResponse['followers'],
+        "is_business_page": instagramResponse['is_business'],
+        "is_professional_page": instagramResponse['is_professional'],
+        "page_category_enum": instagramResponse['category_enum'],
+        "page_category_name": instagramResponse['category_name'],
       };
       Navigator.pushReplacementNamed(context, "/verification",
           arguments: routeData);
