@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -9,9 +10,87 @@ class EmailScreen extends StatefulWidget {
 }
 
 class _EmailScreenState extends State<EmailScreen> {
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
+  final _igIdController = TextEditingController();
   bool _isLoading = false;
+  bool _isCheckingIgId = false;
+  bool _isSendingEmail = false;
   bool _isAcceptedTermAndCondition = true;
+
+  Future<void> checkIgIdAndSendEmail() async {
+    Map instagramResponse;
+    bool _isValid = true;
+    setState(() {
+      _isCheckingIgId = true;
+    });
+
+    try {
+      instagramResponse = await WebApi().checkInstagramId(_igIdController.text);
+      if (instagramResponse['followers'] < 10000) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("اینستاگرام شما کمتر از ده هزار دنبال کننده دارد."),
+          ),
+        );
+        _isValid = false;
+        return;
+      }
+    } on DioError catch (error) {
+      _isValid = false;
+      if (error.response!.statusCode == 404) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("آیدی اینستاگرام یافت نشد."),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content:
+                Text("خطا در بررسی صفحه اینستاگرام!\nلطفا دوباره تلاش کنید"),
+          ),
+        );
+      }
+      return;
+    }
+
+    setState(() {
+      _isCheckingIgId = false;
+      _isSendingEmail = true;
+    });
+
+    try {
+      await WebApi().sendEmail(_emailController.text);
+    } catch (exception) {
+      _isValid = false;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("خطا در ارسال ایمیل!"),
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = false;
+      _isSendingEmail = false;
+    });
+
+    if (_isValid) {
+      Map routeData = {
+        'email': _emailController.text,
+        'instagram_id': _igIdController.text,
+        "followers": instagramResponse['followers'],
+        "is_business_page": instagramResponse['is_business'],
+        "is_professional_page": instagramResponse['is_professional'],
+        "page_category_enum": instagramResponse['category_enum'],
+        "page_category_name": instagramResponse['category_name'],
+      };
+      Navigator.pushReplacementNamed(context, "/verification",
+          arguments: routeData);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,124 +99,176 @@ class _EmailScreenState extends State<EmailScreen> {
         title: Text("ثبت نام لینکیش"),
       ),
       body: Container(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: 50,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0, vertical: 10.0),
-                child: Text(
-                  "ایمیل خود را وارد نمایید:",
-                  style: TextStyle(fontSize: 18),
-                  textAlign: TextAlign.right,
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 50,
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0, vertical: 10.0),
-                child: TextField(
-                  controller: _emailController,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'ایمیل',
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 10.0),
+                  child: Text(
+                    "ایمیل و آیدی اینستاگرام خود را وارد نمایید:",
+                    style: TextStyle(fontSize: 18),
+                    textAlign: TextAlign.right,
                   ),
-                  keyboardType: TextInputType.emailAddress,
-                  textAlign: TextAlign.center,
-                  textDirection: TextDirection.ltr,
                 ),
-              ),
-              Row(
-                children: [
-                  Checkbox(
-                    checkColor: Colors.white,
-                    value: _isAcceptedTermAndCondition,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        _isAcceptedTermAndCondition = value!;
-                      });
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 10.0),
+                  child: TextFormField(
+                    controller: _emailController,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'ایمیل',
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    textAlign: TextAlign.left,
+                    textDirection: TextDirection.ltr,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'فیلد ایمیل خالی است';
+                      }
+                      if (!value.contains('@') || !value.contains('.')) {
+                        return 'ایمیل نامعتبر است';
+                      }
+                      return null;
                     },
                   ),
-                  TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pushNamed("/terms-conditions");
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 10.0),
+                  child: TextFormField(
+                    controller: _igIdController,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'آیدی اینستاگرام',
+                      suffixText: '@',
+                    ),
+                    textAlign: TextAlign.left,
+                    textDirection: TextDirection.ltr,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'فیلد آیدی اینستاگرام خالی است';
+                      }
+                      if (value.contains(' ') ||
+                          value.contains('-') ||
+                          value.contains('@')) {
+                        return 'آیدی نامعتبر است';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                Row(
+                  children: [
+                    Checkbox(
+                      checkColor: Colors.white,
+                      value: _isAcceptedTermAndCondition,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          _isAcceptedTermAndCondition = value!;
+                        });
                       },
-                      child: Text(
-                        'شرایط و ضوابط',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      )),
-                  Text("را میپذیرم"),
-                ],
-              ),
-              SizedBox(
-                height: 50,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.all(10),
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          if (!_isAcceptedTermAndCondition) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content:
-                                    Text("شرایط و ضوابط را تایید نکرده‌اید"),
-                              ),
-                            );
-                          } else {
+                    ),
+                    TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pushNamed("/terms-conditions");
+                        },
+                        child: Text(
+                          'شرایط و ضوابط',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        )),
+                    Text("را میپذیرم"),
+                  ],
+                ),
+                SizedBox(
+                  height: 30,
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12.0),
+                  child: Center(
+                    child: _isLoading
+                        ? Text(
+                            _isCheckingIgId
+                                ? "در حال بررسی پیج اینستاگرام..."
+                                : _isSendingEmail
+                                    ? "در حال ارسال ایمیل..."
+                                    : "",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).primaryColor),
+                          )
+                        : null,
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        child: ElevatedButton(
+                          onPressed: () async {
                             if (!_isLoading) {
                               setState(() {
                                 _isLoading = true;
                               });
-                              try {
-                                await WebApi().sendEmail(_emailController.text);
-                                Navigator.pushReplacementNamed(
-                                    context, "/verification",
-                                    arguments: _emailController.text);
-                              } catch (exception) {
-                                // todo should add a validation, show the exception
-                                print(exception);
+
+                              if (!_isAcceptedTermAndCondition) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        "شرایط و ضوابط را تایید نکرده‌اید"),
+                                  ),
+                                );
+                              } else {
+                                await checkIgIdAndSendEmail();
+                                setState(() {
+                                  _isCheckingIgId = false;
+                                  _isSendingEmail = false;
+                                });
                               }
+
                               setState(() {
                                 _isLoading = false;
                               });
                             }
-                          }
-                        },
-                        child: _isLoading
-                            ? CircularProgressIndicator(
-                                color: Colors.white,
-                              )
-                            : Text(
-                                "ادامه",
-                                style: TextStyle(fontSize: 16),
-                              ),
+                          },
+                          child: _isLoading
+                              ? CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                              : Text(
+                                  "ادامه",
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('قبلا ثبت نام کرده‌اید؟ '),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pushReplacementNamed('/login');
-                    },
-                    child: Text('ورود'),
-                  ),
-                  SizedBox(width: 20),
-                ],
-              ),
-            ],
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('قبلا ثبت نام کرده‌اید؟ '),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pushReplacementNamed('/login');
+                      },
+                      child: Text('ورود'),
+                    ),
+                    SizedBox(width: 20),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

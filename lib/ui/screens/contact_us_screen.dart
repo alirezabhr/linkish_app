@@ -43,7 +43,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
       _loadingData = true;
     });
 
-    String phone = await WebApi().getOnce('phone');
+    String phone = await WebApi().getOnce('support phone');
     this.phoneNumber = phone;
 
     setState(() {

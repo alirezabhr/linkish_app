@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_insta/flutter_insta.dart';
 
 import '../widgets/location_selector.dart';
 import '../widgets/TopicSelector.dart';
@@ -13,6 +12,7 @@ import '../widgets/custom_dialog.dart';
 import '../../models/topic.dart';
 import '../../models/influencer.dart';
 import '../../services/web_api.dart';
+import '../../services/utils.dart' as utils;
 
 enum InstagramPageType { general, pro }
 enum LocationType { all, specific }
@@ -27,12 +27,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _formKey = GlobalKey<FormState>();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  final _igIdController = TextEditingController();
   late final List<dynamic> _provincesAndCities;
   String _province = "";
   String _city = "";
   LocationType? _locType = LocationType.all;
-  InstagramPageType? _pageType = InstagramPageType.general;
+  InstagramPageType? _pageType = InstagramPageType.pro;
   bool _isRegisteringProvincesAndCities = false;
   bool _isRegistering = false;
 
@@ -75,27 +74,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     this._topicsList.sort((a, b) => a.title.compareTo(b.title));
   }
 
-  Future<bool> isValidPage(String instagramId) async {
-    try {
-      FlutterInsta flutterInsta = new FlutterInsta();
-      await flutterInsta.getProfileData(instagramId);
-      int followers = int.parse(flutterInsta.followers!);
-      if (followers < 10000) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text("تعداد فالوئر شما کمتر از 10هزار نفر است")),
-        );
-        return false;
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("آیدی اینستاگرام نامعتبر است")),
-      );
-      return false;
-    }
-    return true;
-  }
-
   Future<void> loadCities() async {
     setState(() {
       _isRegisteringProvincesAndCities = true;
@@ -110,7 +88,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     this._city = _provincesAndCities.first['cities'].first['name'];
   }
 
-  void registerUser(String email) async {
+  void registerUser(Map routeData) async {
     bool isAllLocations = _locType == LocationType.all ? true : false;
     if (isAllLocations) {
       this._province = "همه";
@@ -139,18 +117,25 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       // print("is valid page: $isValidInstagram");
       bool isValidInstagram = true;
       if (isValidInstagram) {
+        String os = utils.getDeviceOs();
         try {
-          Map data = {
-            "email": email,
+          Map sendData = {
+            "email": routeData['email'],
             "password": _passwordController.text,
-            "instagram_id": _igIdController.text,
+            "instagram_id": routeData['instagram_id'],
             "province": _province,
             "city": _city,
             "is_general_page": isGeneralPage,
             "topics": _finalTopics,
+            "followers": routeData['followers'],
+            "is_business_page": routeData['is_business_page'],
+            "is_professional_page": routeData['is_professional_page'],
+            "page_category_enum": routeData['page_category_enum'],
+            "page_category_name": routeData['page_category_name'],
+            "os": os,
           };
-          Map response = await WebApi().influencerSignup(data);
-          influencer.setUserData(data);
+          Map response = await WebApi().influencerSignup(sendData);
+          influencer.setUserData(sendData);
           influencer.setUserId(response["id"]);
           influencer.setToken("jwt " + response["token"]);
           influencer.registerUser();
@@ -177,7 +162,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   @override
   Widget build(BuildContext context) {
     influencer = Provider.of<Influencer>(context);
-    String emailAddress = ModalRoute.of(context)!.settings.arguments as String;
+    Map routeData = ModalRoute.of(context)!.settings.arguments as Map;
+    String emailAddress = routeData['email'];
+    String instagramId = routeData['instagram_id'];
     return Scaffold(
       appBar: AppBar(
         title: Text("ثبت نام لینکیش"),
@@ -230,6 +217,44 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 16.0, vertical: 10.0),
+                  child: Container(
+                    width: double.maxFinite,
+                    padding: EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(4),
+                      // labelText: 'Password',
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "اینستاگرام:",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: FittedBox(
+                            child: Text(
+                              instagramId,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey[700],
+                              ),
+                              textDirection: TextDirection.ltr,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 10.0),
                   child: TextFormField(
                     controller: _passwordController,
                     decoration: InputDecoration(
@@ -254,24 +279,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       }
                       if (value.length < 8) {
                         return 'رمز عبور باید شامل حداقل 8 کاراکتر باشد';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0, vertical: 10.0),
-                  child: TextFormField(
-                    controller: _igIdController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'آیدی اینستاگرام',
-                    ),
-                    textDirection: TextDirection.ltr,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'فیلد آیدی اینستاگرام خالی است';
                       }
                       return null;
                     },
@@ -395,7 +402,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   ],
                 ),
                 ListTile(
-                  title: const Text('محتوای پیج من عمومی است'),
+                  title: const Text('محتوای پیج من تخصصی نیست'),
                   leading: Radio<InstagramPageType>(
                     value: InstagramPageType.general,
                     groupValue: _pageType,
@@ -449,7 +456,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
                               if (!_isRegistering) {
-                                registerUser(emailAddress);
+                                registerUser(routeData);
                               }
                             }
                           },

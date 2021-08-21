@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:linkish/models/influencer_ad.dart';
 import 'package:linkish/models/topic.dart';
@@ -125,4 +126,14 @@ String addDashCardNo(String cardNo) {
   }
 
   return newStr;
+}
+
+String getDeviceOs() {
+  if (Platform.isAndroid) {
+    return 'Android';
+  } else if (Platform.isIOS) {
+    return 'IOS';
+  } else {
+    return "other OS or can't detect";
+  }
 }
