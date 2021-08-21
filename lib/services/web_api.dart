@@ -10,10 +10,14 @@ import '../models/influencer.dart';
 import '../models/withdraw.dart';
 
 class WebApi {
-  static final String baseUrl = "https://ln6.ir";
-  final String _baseUrl = "https://ln6.ir/";
+  static final String baseUrl = "http://192.168.1.9:8000";
+  final String _baseUrl = "http://192.168.1.9:8000/";
+
+  // static final String baseUrl = "https://ln6.ir";
+  // final String _baseUrl = "https://ln6.ir/";
   late final String _obtainTokenUrl;
   late final String _influencerLogin;
+  late final String _checkInstagramIdUrl;
   late final String _emailUrl;
   late final String _otpUrl;
   late final String _topicsUrl;
@@ -31,6 +35,7 @@ class WebApi {
   WebApi() {
     this._obtainTokenUrl = this._baseUrl + "obtain-token/";
     this._influencerLogin = this._baseUrl + "login/influencer/";
+    this._checkInstagramIdUrl = this._baseUrl + "check-igid/";
     this._emailUrl = this._baseUrl + "send-email/";
     this._otpUrl = this._baseUrl + "check-otp/";
     this._topicsUrl = this._baseUrl + "topic/";
@@ -65,6 +70,12 @@ class WebApi {
       "password": password,
     };
     Response response = await Dio().post(this._influencerLogin, data: data);
+    return response.data;
+  }
+
+  Future<Map> checkInstagramId(String instagramId) async {
+    Map body = {'instagram_id': instagramId};
+    Response response = await Dio().post(this._checkInstagramIdUrl, data: body);
     return response.data;
   }
 
