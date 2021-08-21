@@ -193,7 +193,7 @@ class _EmailScreenState extends State<EmailScreen> {
                             _isCheckingIgId
                                 ? "در حال بررسی پیج اینستاگرام..."
                                 : _isSendingEmail
-                                    ? "در خال ارسال ایمیل..."
+                                    ? "در حال ارسال ایمیل..."
                                     : "",
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
