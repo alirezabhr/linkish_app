@@ -27,7 +27,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _formKey = GlobalKey<FormState>();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  final _igIdController = TextEditingController();
   late final List<dynamic> _provincesAndCities;
   String _province = "";
   String _city = "";
@@ -110,7 +109,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     this._city = _provincesAndCities.first['cities'].first['name'];
   }
 
-  void registerUser(String email) async {
+  void registerUser(String email, String instagramId) async {
     bool isAllLocations = _locType == LocationType.all ? true : false;
     if (isAllLocations) {
       this._province = "همه";
@@ -143,7 +142,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           Map data = {
             "email": email,
             "password": _passwordController.text,
-            "instagram_id": _igIdController.text,
+            "instagram_id": instagramId,
             "province": _province,
             "city": _city,
             "is_general_page": isGeneralPage,
@@ -177,7 +176,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   @override
   Widget build(BuildContext context) {
     influencer = Provider.of<Influencer>(context);
-    String emailAddress = ModalRoute.of(context)!.settings.arguments as String;
+    Map routeData = ModalRoute.of(context)!.settings.arguments as Map;
+    String emailAddress = routeData['email'];
+    String instagramId = routeData['instagram_id'];
     return Scaffold(
       appBar: AppBar(
         title: Text("ثبت نام لینکیش"),
@@ -230,6 +231,44 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 16.0, vertical: 10.0),
+                  child: Container(
+                    width: double.maxFinite,
+                    padding: EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(4),
+                      // labelText: 'Password',
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "اینستاگرام:",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: FittedBox(
+                            child: Text(
+                              instagramId,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey[700],
+                              ),
+                              textDirection: TextDirection.ltr,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 10.0),
                   child: TextFormField(
                     controller: _passwordController,
                     decoration: InputDecoration(
@@ -254,24 +293,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       }
                       if (value.length < 8) {
                         return 'رمز عبور باید شامل حداقل 8 کاراکتر باشد';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0, vertical: 10.0),
-                  child: TextFormField(
-                    controller: _igIdController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'آیدی اینستاگرام',
-                    ),
-                    textDirection: TextDirection.ltr,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'فیلد آیدی اینستاگرام خالی است';
                       }
                       return null;
                     },
@@ -395,7 +416,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   ],
                 ),
                 ListTile(
-                  title: const Text('محتوای پیج من عمومی است'),
+                  title: const Text('محتوای پیج من تخصصی نیست'),
                   leading: Radio<InstagramPageType>(
                     value: InstagramPageType.general,
                     groupValue: _pageType,
@@ -449,7 +470,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
                               if (!_isRegistering) {
-                                registerUser(emailAddress);
+                                registerUser(emailAddress, instagramId);
                               }
                             }
                           },
