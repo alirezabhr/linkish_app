@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_insta/flutter_insta.dart';
 
 class InstaDetails extends StatefulWidget {
   final String instagramId;
@@ -20,14 +19,14 @@ class _InstaDetailsState extends State<InstaDetails> {
       _isLoading = true;
     });
 
-    FlutterInsta flutterInsta = new FlutterInsta();
-    await flutterInsta.getProfileData(widget.instagramId);
-
-    setState(() {
-      _followers = int.parse(flutterInsta.followers!);
-      _imageUrl = flutterInsta.imgurl;
-      _isLoading = false;
-    });
+    // FlutterInsta flutterInsta = new FlutterInsta();
+    // await flutterInsta.getProfileData(widget.instagramId);
+    //
+    // setState(() {
+    //   _followers = int.parse(flutterInsta.followers!);
+    //   _imageUrl = flutterInsta.imgurl;
+    //   _isLoading = false;
+    // });
   }
 
   @override
