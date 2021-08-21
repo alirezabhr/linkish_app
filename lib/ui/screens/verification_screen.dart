@@ -16,8 +16,8 @@ class _VerificationScreenState extends State<VerificationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final String emailAddress =
-        ModalRoute.of(context)!.settings.arguments as String;
+    final Map routeData = ModalRoute.of(context)!.settings.arguments as Map;
+    final String emailAddress = routeData['email'];
 
     return Scaffold(
       appBar: AppBar(
@@ -119,17 +119,23 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                       emailAddress, _otpController.text);
                                   Navigator.pushReplacementNamed(
                                       context, "/registration",
-                                      arguments: emailAddress);
+                                      arguments: routeData);
                                 } on DioError catch (exception) {
                                   if (exception.response!.statusCode == 400) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
-                                          content: Text(
-                                              "رمز یکبار مصرف اشتباه است")),
+                                        content:
+                                            Text("رمز یکبار مصرف اشتباه است"),
+                                      ),
+                                    );
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content:
+                                            Text("خطا در بررسی رمز یکبار مصرف"),
+                                      ),
                                     );
                                   }
-                                  print(
-                                      exception); // todo should add a validation, show the exception
                                 }
                                 setState(() {
                                   _isLoading = false;
@@ -138,7 +144,9 @@ class _VerificationScreenState extends State<VerificationScreen> {
                             }
                           },
                           child: _isLoading
-                              ? CircularProgressIndicator(color: Colors.white,)
+                              ? CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
                               : Text(
                                   "ادامه",
                                   style: TextStyle(fontSize: 16),
