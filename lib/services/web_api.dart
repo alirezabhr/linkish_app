@@ -10,11 +10,8 @@ import '../models/influencer.dart';
 import '../models/withdraw.dart';
 
 class WebApi {
-  static final String baseUrl = "http://192.168.1.9:8000";
-  final String _baseUrl = "http://192.168.1.9:8000/";
-
-  // static final String baseUrl = "https://ln6.ir";
-  // final String _baseUrl = "https://ln6.ir/";
+  static final String baseUrl = "https://ln6.ir";
+  final String _baseUrl = "https://ln6.ir/";
   late final String _obtainTokenUrl;
   late final String _influencerLogin;
   late final String _checkInstagramIdUrl;
