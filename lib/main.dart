@@ -15,6 +15,7 @@ import 'ui/screens/bank_account_screen.dart';
 import 'ui/screens/password_screen.dart';
 import 'ui/screens/change_profile_screen.dart';
 import 'ui/screens/contact_us_screen.dart';
+import 'ui/screens/forget_password_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,6 +53,7 @@ class MyApp extends StatelessWidget {
           '/change-profile': (ctx) => ChangeProfileScreen(),
           '/contact-us': (ctx) => ContactUsScreen(),
           '/login': (ctx) => LoginScreen(),
+          '/forget-password': (ctx) => ForgetPasswordScreen(),
         },
       ),
     );

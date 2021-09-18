@@ -179,11 +179,23 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pushReplacementNamed('/email');
-                  },
-                  child: Text('ساخت حساب جدید'),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pushNamed('/forget-password');
+                      },
+                      child: Text('فراموشی رمز؟'),
+                    ),
+                    Text(' / ', style: TextStyle(fontSize: 18)),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pushReplacementNamed('/email');
+                      },
+                      child: Text('ساخت حساب جدید'),
+                    ),
+                  ],
                 ),
               ],
             ),
