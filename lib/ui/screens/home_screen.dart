@@ -5,6 +5,7 @@ import '../screens/suggested_ad_screen.dart';
 import '../screens/approved_ad_screen.dart';
 import '../screens/wallet_screen.dart';
 import '../screens/profile_screen.dart';
+import '../../services/analytics_service.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -32,7 +33,18 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text("لینکیش"),
         actions: [
-          IconButton(onPressed: () {}, icon: Icon(Icons.notifications_sharp)),
+          IconButton(
+            onPressed: () async {
+              AnalyticsService analytics = AnalyticsService();
+              await analytics.sendLog(
+                'notification_btn',
+                {
+                  "message": 'pressed on btn',
+                },
+              );
+            },
+            icon: Icon(Icons.notifications_sharp),
+          ),
         ],
       ),
       // drawer: Drawer(),
@@ -47,7 +59,8 @@ class _HomePageState extends State<HomePage> {
             label: 'کمپین ها',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_balance_wallet_outlined, color: Colors.orange),
+            icon: Icon(Icons.account_balance_wallet_outlined,
+                color: Colors.orange),
             label: 'کیف پول',
           ),
           BottomNavigationBarItem(

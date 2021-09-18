@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/influencer.dart';
 import '../../services/web_api.dart';
+import '../../services/analytics_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -35,20 +36,39 @@ class _LoginScreenState extends State<LoginScreen> {
       return true;
     } on DioError catch (e) {
       if (e.response!.statusCode == 400) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("ایمیل یا رمز عبور اشتباه است"),
-          ),
-        );
+        showSnackError("ایمیل یا رمز عبور اشتباه است");
       }
+
+      AnalyticsService analytics = AnalyticsService();
+      await analytics.sendLog(
+        'login',
+        {
+          "catch_in": "dio error login screen",
+          "response_status_code": e.response!.statusCode,
+          "response_data": e.response!.data,
+          "email": email,
+        },
+      );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("خطا!"),
-        ),
+      showSnackError("خطا!");
+
+      AnalyticsService analytics = AnalyticsService();
+      await analytics.sendLog(
+        'login',
+        {
+          "catch_in": "catch in login screen",
+          "error": e,
+          "email": email,
+        },
       );
     }
     return false;
+  }
+
+  void showSnackError(String errorMsg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(errorMsg)),
+    );
   }
 
   @override

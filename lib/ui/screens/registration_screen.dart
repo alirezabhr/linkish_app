@@ -13,6 +13,7 @@ import '../../models/topic.dart';
 import '../../models/influencer.dart';
 import '../../services/web_api.dart';
 import '../../services/utils.dart' as utils;
+import '../../services/analytics_service.dart';
 
 enum InstagramPageType { general, pro }
 enum LocationType { all, specific }
@@ -118,22 +119,24 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       bool isValidInstagram = true;
       if (isValidInstagram) {
         String os = utils.getDeviceOs();
+
+        Map sendData = {
+          "email": routeData['email'],
+          "password": _passwordController.text,
+          "instagram_id": routeData['instagram_id'],
+          "province": _province,
+          "city": _city,
+          "is_general_page": isGeneralPage,
+          "topics": _finalTopics,
+          "followers": routeData['followers'],
+          "is_business_page": routeData['is_business_page'],
+          "is_professional_page": routeData['is_professional_page'],
+          "page_category_enum": routeData['page_category_enum'],
+          "page_category_name": routeData['page_category_name'],
+          "os": os,
+        };
+
         try {
-          Map sendData = {
-            "email": routeData['email'],
-            "password": _passwordController.text,
-            "instagram_id": routeData['instagram_id'],
-            "province": _province,
-            "city": _city,
-            "is_general_page": isGeneralPage,
-            "topics": _finalTopics,
-            "followers": routeData['followers'],
-            "is_business_page": routeData['is_business_page'],
-            "is_professional_page": routeData['is_professional_page'],
-            "page_category_enum": routeData['page_category_enum'],
-            "page_category_name": routeData['page_category_name'],
-            "os": os,
-          };
           Map response = await WebApi().influencerSignup(sendData);
           influencer.setUserData(sendData);
           influencer.setUserId(response["id"]);
@@ -141,8 +144,28 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           influencer.registerUser();
           Navigator.pushReplacementNamed(context, "/home");
         } on DioError catch (e) {
-          print(e.response!
-              .data); // todo should add a validation, show the exception
+          AnalyticsService analytics = AnalyticsService();
+          await analytics.sendLog(
+            'register',
+            {
+              "catch_in": "dio error in registration",
+              "response_status_code": e.response!.statusCode,
+              "response_data": e.response!.data,
+              "send_data": sendData
+            },
+          );
+          showSnackError("خطا در ثبت نام!");
+        } catch (e) {
+          AnalyticsService analytics = AnalyticsService();
+          await analytics.sendLog(
+            'register',
+            {
+              "catch_in": "catch in registration",
+              "error": e,
+              "send_data": sendData
+            },
+          );
+          showSnackError("خطا در ثبت نام!");
         }
       }
 
@@ -150,6 +173,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         _isRegistering = false;
       });
     }
+  }
+
+  void showSnackError(String errorMsg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(errorMsg)),
+    );
   }
 
   @override

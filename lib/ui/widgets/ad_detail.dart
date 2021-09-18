@@ -12,9 +12,11 @@ import '../../models/influencer_ad.dart';
 import '../../models/ad.dart';
 import '../../services/web_api.dart';
 import '../../services/utils.dart' as utils;
+import '../../services/analytics_service.dart';
 
 class AdDetail extends StatefulWidget {
   final InfluencerAd influencerAd;
+
   AdDetail(this.influencerAd);
 
   @override
@@ -62,10 +64,10 @@ class _AdDetailState extends State<AdDetail> {
       if (await directory.exists()) {
         await Dio().download(url, saveFile.path,
             onReceiveProgress: (value1, value2) {
-          setState(() {
-            progress = (value1 / value2) * 100;
-          });
-        });
+              setState(() {
+                progress = (value1 / value2) * 100;
+              });
+            });
         this._mediaPath = saveFile.path;
         if (Platform.isIOS) {
           await ImageGallerySaver.saveFile(saveFile.path,
@@ -77,6 +79,13 @@ class _AdDetailState extends State<AdDetail> {
       }
       return false;
     } catch (e) {
+      AnalyticsService analytics = AnalyticsService();
+      await analytics.sendLog(
+        'save_ad_media',
+        {
+          "error": e,
+        },
+      );
       print(e);
       return false;
     }
@@ -134,10 +143,16 @@ class _AdDetailState extends State<AdDetail> {
     return mediaUrl;
   }
 
+  void showSnackError(String errorMsg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(errorMsg)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final String remainingTime =
-        utils.calculateRemainTime(this.widget.influencerAd.approvedAt);
+    utils.calculateRemainTime(this.widget.influencerAd.approvedAt);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -192,16 +207,30 @@ class _AdDetailState extends State<AdDetail> {
                   padding: const EdgeInsets.symmetric(
                       vertical: 12.0, horizontal: 8.0),
                   child: Text(
-                    "نوع محتوا: ${widget.influencerAd.ad.isVideo ? "ویدئو" : "عکس"}",
+                    "نوع محتوا: ${widget.influencerAd.ad.isVideo
+                        ? "ویدئو"
+                        : "عکس"}",
                     style: TextStyle(fontSize: 15),
                   ),
                 ),
                 ElevatedButton.icon(
                   icon: Icon(Icons.download_sharp),
                   onPressed: () async {
-                    String mediaUrl = getMediaUrl(widget.influencerAd.ad);
-                    await downloadFile(
+                    try {
+                      String mediaUrl = getMediaUrl(widget.influencerAd.ad);
+                      await downloadFile(
                         mediaUrl, widget.influencerAd.ad.isVideo);
+                    } catch (e) {
+                      showSnackError('خطا در دانلود محتوای تبلیغ!');
+
+                      AnalyticsService analytics = AnalyticsService();
+                      await analytics.sendLog(
+                        'download_ad_media',
+                        {
+                          "error": e,
+                        },
+                      );
+                    }
                   },
                   label: Text("دانلود"),
                 ),
@@ -211,16 +240,22 @@ class _AdDetailState extends State<AdDetail> {
                   onPressed: () async {
                     String mediaUrl = getMediaUrl(widget.influencerAd.ad);
                     String newMediaName = utils.getCurrentDateTime();
-                    String format = widget.influencerAd.ad.isVideo ? ".mp4" : ".jpg";
+                    String format = widget.influencerAd.ad.isVideo
+                        ? ".mp4"
+                        : ".jpg";
 
                     try {
                       await this.saveMedia(mediaUrl, newMediaName + format);
-                      SocialShare.shareInstagramStory(_mediaPath, attributionURL: mediaUrl);
+                      SocialShare.shareInstagramStory(
+                          _mediaPath, attributionURL: mediaUrl);
                     } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('در حال حاضر امکان انتشار مستقیم به استوری وجود ندارد!'),
-                        ),
+                      showSnackError('در حال حاضر امکان انتشار مستقیم به استوری وجود ندارد!');
+                      AnalyticsService analytics = AnalyticsService();
+                      await analytics.sendLog(
+                        'share_to_story',
+                        {
+                          "error": e,
+                        },
                       );
                     }
                   },
@@ -232,8 +267,8 @@ class _AdDetailState extends State<AdDetail> {
           Text(_isDownloading
               ? "دانلود شده: $progress%"
               : _isDownloaded
-                  ? "با موفقیت دانلود شد"
-                  : ""),
+              ? "با موفقیت دانلود شد"
+              : ""),
           Container(
             padding: const EdgeInsets.only(bottom: 8.0),
             child: Text(
