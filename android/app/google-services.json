@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "535123958015",
+    "project_id": "linkish-25956",
+    "storage_bucket": "linkish-25956.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:535123958015:android:3fb5315a6df952722ad4ca",
+        "android_client_info": {
+          "package_name": "ir.linkish.linkish"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "535123958015-mj8qume55f90sv57dg3tfajtg1a9b7rr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsQraJwnf_HzOQWV9F5_5bMXXCqHwZpJ4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "535123958015-mj8qume55f90sv57dg3tfajtg1a9b7rr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
