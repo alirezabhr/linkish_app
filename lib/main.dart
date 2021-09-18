@@ -1,10 +1,10 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:linkish/ui/screens/terms_condtions_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'models/influencer.dart';
-
+import 'ui/screens/terms_condtions_screen.dart';
 import 'ui/screens/welcome_screen.dart';
 import 'ui/screens/login_screen.dart';
 import 'ui/screens/email_screen.dart';
@@ -16,7 +16,9 @@ import 'ui/screens/password_screen.dart';
 import 'ui/screens/change_profile_screen.dart';
 import 'ui/screens/contact_us_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
