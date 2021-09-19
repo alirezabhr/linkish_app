@@ -112,7 +112,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                       if (value == null || value.isEmpty) {
                         return 'فیلد خالی است';
                       }
-                      if (value.length <= 8) {
+                      if (value.length < 8) {
                         return 'رمز عبور باید حداقل 8 کاراکتر باشد';
                       }
                       return null;
@@ -147,7 +147,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                       if (value == null || value.isEmpty) {
                         return 'فیلد خالی است';
                       }
-                      if (value.length <= 8) {
+                      if (value.length < 8) {
                         return 'رمز عبور باید حداقل 8 کاراکتر باشد';
                       }
                       if (value != _passController.text) {
