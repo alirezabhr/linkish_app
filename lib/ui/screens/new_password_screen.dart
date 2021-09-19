@@ -38,37 +38,30 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
       showSnackBar("رمز عبور با موفقیت تغییر یافت.");
       Navigator.of(context).pop();
     } on DioError catch(e) {
-
-      print('dio error');
-      print(e.response!.statusCode);
-      print(e.response!.data);
       showSnackBar("خطا در عملیات");
 
-      // AnalyticsService analytics = AnalyticsService();
-      // await analytics.sendLog(
-      //   'forget_password',
-      //   {
-      //     "catch_in": "dio error in forget password",
-      //     "response_status_code": e.response!.statusCode,
-      //     "response_data": e.response!.data,
-      //     "send_data": data,
-      //   },
-      // );
+      AnalyticsService analytics = AnalyticsService();
+      await analytics.sendLog(
+        'forget_password',
+        {
+          "catch_in": "dio error in forget password",
+          "response_status_code": e.response!.statusCode,
+          "response_data": e.response!.data,
+          "send_data": data,
+        },
+      );
     } catch (e) {
-      print('catch error');
-      print(e);
       showSnackBar("خطا در عملیات");
 
-
-      // AnalyticsService analytics = AnalyticsService();
-      // await analytics.sendLog(
-      //   'forget_password',
-      //   {
-      //     "catch_in": "catch error in forget password",
-      //     "error": e,
-      //     "send_data": data,
-      //   },
-      // );
+      AnalyticsService analytics = AnalyticsService();
+      await analytics.sendLog(
+        'forget_password',
+        {
+          "catch_in": "catch error in forget password",
+          "error": e,
+          "send_data": data,
+        },
+      );
     } finally {
       setState(() {
         _isSubmitting = false;
