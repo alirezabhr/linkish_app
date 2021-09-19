@@ -2,10 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:linkish/services/web_api.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:package_info/package_info.dart';
 
 import '../../models/influencer.dart';
 
@@ -49,13 +47,13 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   }
 
   _loadData() async {
-    bool _isUpdated = await isUpdatedAppVersion();
-    if (!_isUpdated) {
-      String msgTitle = 'آپدیت';
-      String msgBody = 'برای ورود به اپلیکیش باید نسخه جدید را دانلود کنید.';
-      await showCustomDialog(msgTitle, msgBody);
-      return;
-    }
+    // bool _isUpdated = await isUpdatedAppVersion();
+    // if (!_isUpdated) {
+    //   String msgTitle = 'آپدیت';
+    //   String msgBody = 'برای ورود به اپلیکیش باید نسخه جدید را دانلود کنید.';
+    //   await showCustomDialog(msgTitle, msgBody);
+    //   return;
+    // }
 
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     bool? isRegistered = _prefs.getBool("is_registered");
@@ -67,22 +65,22 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     }
   }
 
-  Future<bool> isUpdatedAppVersion() async {
-    String databaseAppVersion = '';
-
-    try {
-      databaseAppVersion = await WebApi().getOnce('version');
-    } catch(_) {
-      String msgTitle = 'خطا!';
-      String msgBody = 'خطا در برقراری ارتباط با سرور.\nدسترسی به اینترنت را بررسی کنید.';
-      await showCustomDialog(msgTitle, msgBody);
-    }
-
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    this.appVersion = packageInfo.version;
-
-    return databaseAppVersion == appVersion;
-  }
+  // Future<bool> isUpdatedAppVersion() async {
+  //   String databaseAppVersion = '';
+  //
+  //   try {
+  //     databaseAppVersion = await WebApi().getOnce('version');
+  //   } catch(_) {
+  //     String msgTitle = 'خطا!';
+  //     String msgBody = 'خطا در برقراری ارتباط با سرور.\nدسترسی به اینترنت را بررسی کنید.';
+  //     await showCustomDialog(msgTitle, msgBody);
+  //   }
+  //
+  //   PackageInfo packageInfo = await PackageInfo.fromPlatform();
+  //   this.appVersion = packageInfo.version;
+  //
+  //   return databaseAppVersion == appVersion;
+  // }
 
   void startTimer() {
     _timer = new Timer.periodic(
@@ -189,7 +187,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       ),
                       Center(
                         child: Text(
-                          'نسخه 1.4.1',
+                          'نسخه 1.4.3',
                           textAlign: TextAlign.center,
                         ),
                       ),
