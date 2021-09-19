@@ -16,6 +16,8 @@ import 'ui/screens/password_screen.dart';
 import 'ui/screens/change_profile_screen.dart';
 import 'ui/screens/contact_us_screen.dart';
 import 'ui/screens/forget_password_screen.dart';
+import 'ui/screens/otp_forget_password_screen.dart';
+import 'ui/screens/new_password_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -54,6 +56,8 @@ class MyApp extends StatelessWidget {
           '/contact-us': (ctx) => ContactUsScreen(),
           '/login': (ctx) => LoginScreen(),
           '/forget-password': (ctx) => ForgetPasswordScreen(),
+          '/otp-forget-password': (ctx) => OtpForgetPasswordScreen(),
+          '/new-password': (ctx) => NewPasswordScreen(),
         },
       ),
     );
