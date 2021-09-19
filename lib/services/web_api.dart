@@ -28,6 +28,7 @@ class WebApi {
   late final String _withdrawUrl;
   late final String _walletAmountUrl;
   late final String _contactUsUrl;
+  late final String _forgetPassword;
 
   WebApi() {
     this._obtainTokenUrl = this._baseUrl + "obtain-token/";
@@ -46,6 +47,7 @@ class WebApi {
     this._withdrawUrl = this._baseUrl + "withdraw/";
     this._walletAmountUrl = this._baseUrl + "wallet/";
     this._contactUsUrl = this._baseUrl + "contact-us/";
+    this._forgetPassword = this._baseUrl + "forget-password/";
   }
 
   Future<String> obtainToken() async {
@@ -387,5 +389,14 @@ class WebApi {
       body = response.data['body'];
     }
     return body;
+  }
+
+  Future<void> forgetPassword(Map data) async {
+    Map<String, dynamic> sendData = {
+      'email': data['email'],
+      'password': data['password'],
+      'otp': int.parse(data['otp']),
+    };
+    await Dio().put(this._forgetPassword, data: sendData);
   }
 }
