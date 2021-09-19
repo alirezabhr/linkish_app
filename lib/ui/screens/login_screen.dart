@@ -151,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   _isLoggingIn = true;
                                 });
 
-                                String _email = _emailController.text;
+                                String _email = _emailController.text.toLowerCase();
                                 String _password = _passwordController.text;
                                 bool _loginFlag = await logUserIn(
                                     influencer, _email, _password);

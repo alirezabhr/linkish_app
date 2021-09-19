@@ -28,29 +28,16 @@ class _EmailScreenState extends State<EmailScreen> {
     try {
       instagramResponse = await WebApi().checkInstagramId(_igIdController.text);
       if (instagramResponse['followers'] < 10000) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("اینستاگرام شما کمتر از ده هزار دنبال کننده دارد."),
-          ),
-        );
+        showSnackBar("اینستاگرام شما کمتر از ده هزار دنبال کننده دارد.");
         _isValid = false;
         return;
       }
     } on DioError catch (error) {
       _isValid = false;
       if (error.response!.statusCode == 404) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("آیدی اینستاگرام یافت نشد."),
-          ),
-        );
+        showSnackBar("آیدی اینستاگرام یافت نشد.");
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content:
-                Text("خطا در بررسی صفحه اینستاگرام!\nلطفا دوباره تلاش کنید"),
-          ),
-        );
+        showSnackBar("خطا در بررسی صفحه اینستاگرام!\nلطفا دوباره تلاش کنید");
       }
       return;
     }
@@ -60,15 +47,12 @@ class _EmailScreenState extends State<EmailScreen> {
       _isSendingEmail = true;
     });
 
+    String userEmail = _emailController.text.toLowerCase();
     try {
-      await WebApi().sendEmail(_emailController.text);
+      await WebApi().sendEmail(userEmail);
     } catch (exception) {
       _isValid = false;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("خطا در ارسال ایمیل!"),
-        ),
-      );
+      showSnackBar("خطا در ارسال ایمیل!");
       return;
     }
 
@@ -79,7 +63,7 @@ class _EmailScreenState extends State<EmailScreen> {
 
     if (_isValid) {
       Map routeData = {
-        'email': _emailController.text,
+        'email': userEmail,
         'instagram_id': _igIdController.text,
         "followers": instagramResponse['followers'],
         "is_business_page": instagramResponse['is_business'],
@@ -90,6 +74,12 @@ class _EmailScreenState extends State<EmailScreen> {
       Navigator.pushReplacementNamed(context, "/verification",
           arguments: routeData);
     }
+  }
+
+  showSnackBar(message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   @override
@@ -222,12 +212,7 @@ class _EmailScreenState extends State<EmailScreen> {
                               });
 
                               if (!_isAcceptedTermAndCondition) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                        "شرایط و ضوابط را تایید نکرده‌اید"),
-                                  ),
-                                );
+                                showSnackBar("شرایط و ضوابط را تایید نکرده‌اید");
                               } else {
                                 await checkIgIdAndSendEmail();
                                 setState(() {

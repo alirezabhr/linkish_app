@@ -77,9 +77,10 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                               setState(() {
                                 _isLoading = true;
                               });
+                              String userEmail = _emailController.text.toLowerCase();
 
                               try {
-                                await WebApi().sendEmail(_emailController.text);
+                                await WebApi().sendEmail(userEmail);
                               } catch (_) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
@@ -96,7 +97,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                               await Future.delayed(Duration(seconds: 1), () {});
 
                               Navigator.pushReplacementNamed(context, '/otp-forget-password',
-                                  arguments: {'email': _emailController.text});
+                                  arguments: {'email': userEmail});
                               setState(() {
                                 _isLoading = false;
                               });
