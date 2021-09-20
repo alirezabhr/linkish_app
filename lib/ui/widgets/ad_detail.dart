@@ -29,66 +29,80 @@ class _AdDetailState extends State<AdDetail> {
   bool _isDownloaded = false;
   late String _mediaPath;
 
-  Future<bool> saveMedia(String url, String fileName) async {
-    Directory directory;
-    try {
-      if (Platform.isAndroid) {
-        if (await _requestPermission(Permission.storage) &&
-            await _requestPermission(Permission.accessMediaLocation)) {
-          directory = (await getExternalStorageDirectory())!;
-          String newPath = "";
-          List<String> paths = directory.path.split("/");
-          for (int x = 1; x < paths.length; x++) {
-            String folder = paths[x];
-            if (folder != "Android") {
-              newPath += "/" + folder;
-            } else {
-              break;
-            }
-          }
-          newPath = newPath + "/Linkish";
-          directory = Directory(newPath);
-        } else {
-          return false;
-        }
-      } else {
-        if (await _requestPermission(Permission.photos)) {
-          directory = await getApplicationDocumentsDirectory();
-        } else {
-          return false;
-        }
-      }
-      File saveFile = File(directory.path + "/$fileName");
-      if (!await directory.exists()) {
-        await directory.create(recursive: true);
-      }
-      if (await directory.exists()) {
-        await Dio().download(url, saveFile.path,
-            onReceiveProgress: (value1, value2) {
-              setState(() {
-                progress = (value1 / value2) * 100;
-              });
-            });
-        this._mediaPath = saveFile.path;
-        if (Platform.isIOS) {
-          await ImageGallerySaver.saveFile(saveFile.path,
-              isReturnPathOfIOS: true);
-        } else {
-          await ImageGallerySaver.saveFile(saveFile.path);
-        }
+  Future<bool> _hasAcceptedPermissions() async {
+    if (Platform.isAndroid) {
+      if (await _requestPermission(Permission.storage) &&
+          // access media location needed for android 10/Q
+          await _requestPermission(Permission.accessMediaLocation)) {
         return true;
+      } else {
+        return false;
       }
+    }
+    if (Platform.isIOS) {
+      if (await _requestPermission(Permission.photos)) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      // not android or ios
       return false;
-    } catch (e) {
-      AnalyticsService analytics = AnalyticsService();
-      await analytics.sendLog(
-        'save_ad_media',
-        {
-          "error": e,
-        },
-      );
-      print(e);
-      return false;
+    }
+  }
+
+  Future<Directory> getAppDirectory() async {
+    Directory directory;
+
+    if (Platform.isAndroid) {
+      directory = (await getExternalStorageDirectory())!;
+      String newPath = "";
+      List<String> paths = directory.path.split("/");
+      for (int x = 1; x < paths.length; x++) {
+        String folder = paths[x];
+        if (folder != "Android") {
+          newPath += "/" + folder;
+        } else {
+          break;
+        }
+      }
+      newPath = newPath + "/Linkish";
+      directory = Directory(newPath);
+    } else {
+      directory = await getApplicationDocumentsDirectory();
+    }
+
+    return directory;
+  }
+
+  Future<File> getSaveFileData(String fileName) async {
+    Directory directory = await getAppDirectory();
+    if (!await directory.exists()) {
+      await directory.create(recursive: true);
+    }
+
+    File saveFile = File(directory.path + "/$fileName");
+
+    return saveFile;
+  }
+
+  Future<void> downloadMedia(String url, String saveFilePath) async {
+    await Dio().download(url, saveFilePath,
+        onReceiveProgress: (value1, value2) {
+      String progressStr = ((value1 / value2) * 100).toStringAsFixed(2);
+      setState(() {
+        progress = double.parse(progressStr);
+      });
+    });
+
+    this._mediaPath = saveFilePath;
+  }
+
+  Future<void> saveMediaToGallery(String saveFilePath) async {
+    if (Platform.isIOS) {
+      await ImageGallerySaver.saveFile(saveFilePath, isReturnPathOfIOS: true);
+    } else {
+      await ImageGallerySaver.saveFile(saveFilePath);
     }
   }
 
@@ -104,24 +118,14 @@ class _AdDetailState extends State<AdDetail> {
     return false;
   }
 
-  downloadFile(String mediaPathName, bool isVideo) async {
-    setState(() {
-      _isDownloading = true;
-      progress = 0;
-    });
-
+  Future<void> downloadAndSaveMedia(String url, bool isVideo) async {
     String newMediaName = utils.getCurrentDateTime();
     String format = isVideo ? ".mp4" : ".jpg";
-    bool downloaded = await saveMedia(mediaPathName, newMediaName + format);
 
-    if (downloaded) {
-      setState(() {
-        _isDownloading = false;
-        _isDownloaded = true;
-      });
-      print("File Downloaded");
-    } else {
-      print("Problem Downloading File");
+    if (await _hasAcceptedPermissions()) {
+      File saveFile = await getSaveFileData(newMediaName + format);
+      await downloadMedia(url, saveFile.path);
+      await saveMediaToGallery(saveFile.path);
     }
   }
 
@@ -151,7 +155,7 @@ class _AdDetailState extends State<AdDetail> {
   @override
   Widget build(BuildContext context) {
     final String remainingTime =
-    utils.calculateRemainTime(this.widget.influencerAd.approvedAt);
+        utils.calculateRemainTime(this.widget.influencerAd.approvedAt);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -216,16 +220,46 @@ class _AdDetailState extends State<AdDetail> {
                     bool _isAdVideo = widget.influencerAd.ad.isVideo;
                     String mediaUrl = getMediaUrl(widget.influencerAd.ad);
 
+                    setState(() {
+                      _isDownloading = true;
+                      progress = 0;
+                    });
+
                     try {
-                      await downloadFile(mediaUrl, _isAdVideo);
-                    } catch (e) {
+                      await downloadAndSaveMedia(mediaUrl, _isAdVideo);
+                      setState(() {
+                        _isDownloading = false;
+                        _isDownloaded = true;
+                      });
+                    } on DioError catch (error) {
+                      setState(() {
+                        _isDownloading = false;
+                        _isDownloaded = false;
+                      });
                       showSnackError('خطا در دانلود محتوای تبلیغ!');
 
                       AnalyticsService analytics = AnalyticsService();
                       await analytics.sendLog(
-                        'download_ad_media',
+                        'download_ad',
                         {
-                          "error": e,
+                          "catch_in": 'dio error in download media on pressed',
+                          "response_status": error.response!.statusCode,
+                          "response_data": error.response!.data,
+                        },
+                      );
+                    } catch (error) {
+                      setState(() {
+                        _isDownloading = false;
+                        _isDownloaded = false;
+                      });
+                      showSnackError('خطا در ذخیره سازی محتوای تبلیغ!');
+
+                      AnalyticsService analytics = AnalyticsService();
+                      await analytics.sendLog(
+                        'download_ad',
+                        {
+                          "catch_in": 'catch in download media on pressed',
+                          "error": error.toString(),
                         },
                       );
                     }
@@ -242,17 +276,34 @@ class _AdDetailState extends State<AdDetail> {
                     String format = _isAdVideo ? ".mp4" : ".jpg";
 
                     try {
-                      await this.saveMedia(mediaUrl, newMediaName + format);
-                      SocialShare.shareInstagramStory(_mediaPath,
-                          attributionURL: mediaUrl);
-                    } catch (e) {
+                      if (await _hasAcceptedPermissions()) {
+                        File saveFile =
+                            await getSaveFileData(newMediaName + format);
+                        await downloadMedia(mediaUrl, saveFile.path);
+                        await saveMediaToGallery(saveFile.path);
+                        SocialShare.shareInstagramStory(_mediaPath,
+                            attributionURL: mediaUrl);
+                      }
+                    } on DioError catch (error) {
                       showSnackError(
                           'در حال حاضر امکان انتشار مستقیم به استوری وجود ندارد!');
                       AnalyticsService analytics = AnalyticsService();
                       await analytics.sendLog(
                         'share_to_story',
                         {
-                          "error": e,
+                          "catch_in": 'dio error in share media on pressed',
+                          "response_status": error.response!.statusCode,
+                          "response_data": error.response!.data,
+                        },
+                      );
+                    } catch (error) {
+                      showSnackError('خطا در انتشار مستقیم به استوری!');
+                      AnalyticsService analytics = AnalyticsService();
+                      await analytics.sendLog(
+                        'share_to_story',
+                        {
+                          "catch_in": 'catch in share media on pressed',
+                          "error": error.toString(),
                         },
                       );
                     }
@@ -265,8 +316,8 @@ class _AdDetailState extends State<AdDetail> {
           Text(_isDownloading
               ? "دانلود شده: $progress%"
               : _isDownloaded
-              ? "با موفقیت دانلود شد"
-              : ""),
+                  ? "با موفقیت دانلود شد"
+                  : ""),
           Container(
             padding: const EdgeInsets.only(bottom: 8.0),
             child: Text(
