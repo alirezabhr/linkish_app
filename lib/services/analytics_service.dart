@@ -20,7 +20,8 @@ class AnalyticsService {
   }
 
   Future<void> _setUserId() async {
-    String? userEmail = await utils.getUserEmail();
+    String userEmail = "";
+    userEmail = (await utils.getUserEmail())!;
     await analytics.setUserId(userEmail);
   }
 
