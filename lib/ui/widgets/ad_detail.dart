@@ -33,7 +33,8 @@ class _AdDetailState extends State<AdDetail> {
     Directory directory;
     try {
       if (Platform.isAndroid) {
-        if (await _requestPermission(Permission.storage)) {
+        if (await _requestPermission(Permission.storage) &&
+            await _requestPermission(Permission.accessMediaLocation)) {
           directory = (await getExternalStorageDirectory())!;
           String newPath = "";
           List<String> paths = directory.path.split("/");
@@ -135,9 +136,7 @@ class _AdDetailState extends State<AdDetail> {
   }
 
   String getMediaUrl(Ad ad) {
-    String mediaUrl = ad.isVideo
-        ? ad.videoUrl
-        : ad.imageUrl;
+    String mediaUrl = ad.isVideo ? ad.videoUrl : ad.imageUrl;
     mediaUrl = WebApi.baseUrl + mediaUrl;
 
     return mediaUrl;
@@ -207,19 +206,18 @@ class _AdDetailState extends State<AdDetail> {
                   padding: const EdgeInsets.symmetric(
                       vertical: 12.0, horizontal: 8.0),
                   child: Text(
-                    "نوع محتوا: ${widget.influencerAd.ad.isVideo
-                        ? "ویدئو"
-                        : "عکس"}",
+                    "نوع محتوا: ${widget.influencerAd.ad.isVideo ? "ویدئو" : "عکس"}",
                     style: TextStyle(fontSize: 15),
                   ),
                 ),
                 ElevatedButton.icon(
                   icon: Icon(Icons.download_sharp),
                   onPressed: () async {
+                    bool _isAdVideo = widget.influencerAd.ad.isVideo;
+                    String mediaUrl = getMediaUrl(widget.influencerAd.ad);
+
                     try {
-                      String mediaUrl = getMediaUrl(widget.influencerAd.ad);
-                      await downloadFile(
-                        mediaUrl, widget.influencerAd.ad.isVideo);
+                      await downloadFile(mediaUrl, _isAdVideo);
                     } catch (e) {
                       showSnackError('خطا در دانلود محتوای تبلیغ!');
 
@@ -238,18 +236,18 @@ class _AdDetailState extends State<AdDetail> {
                 ElevatedButton.icon(
                   icon: Icon(Icons.share),
                   onPressed: () async {
+                    bool _isAdVideo = widget.influencerAd.ad.isVideo;
                     String mediaUrl = getMediaUrl(widget.influencerAd.ad);
                     String newMediaName = utils.getCurrentDateTime();
-                    String format = widget.influencerAd.ad.isVideo
-                        ? ".mp4"
-                        : ".jpg";
+                    String format = _isAdVideo ? ".mp4" : ".jpg";
 
                     try {
                       await this.saveMedia(mediaUrl, newMediaName + format);
-                      SocialShare.shareInstagramStory(
-                          _mediaPath, attributionURL: mediaUrl);
+                      SocialShare.shareInstagramStory(_mediaPath,
+                          attributionURL: mediaUrl);
                     } catch (e) {
-                      showSnackError('در حال حاضر امکان انتشار مستقیم به استوری وجود ندارد!');
+                      showSnackError(
+                          'در حال حاضر امکان انتشار مستقیم به استوری وجود ندارد!');
                       AnalyticsService analytics = AnalyticsService();
                       await analytics.sendLog(
                         'share_to_story',
