@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'models/influencer.dart';
-import 'ui/screens/terms_condtions_screen.dart';
+import 'ui/screens/terms_conditions_screen.dart';
 import 'ui/screens/welcome_screen.dart';
 import 'ui/screens/login_screen.dart';
 import 'ui/screens/email_screen.dart';
