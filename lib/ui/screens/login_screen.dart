@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/influencer.dart';
 import '../../services/web_api.dart';
+import '../../services/analytics_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -35,20 +36,39 @@ class _LoginScreenState extends State<LoginScreen> {
       return true;
     } on DioError catch (e) {
       if (e.response!.statusCode == 400) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("ایمیل یا رمز عبور اشتباه است"),
-          ),
-        );
+        showSnackError("ایمیل یا رمز عبور اشتباه است");
       }
+
+      AnalyticsService analytics = AnalyticsService();
+      await analytics.sendLog(
+        'login',
+        {
+          "catch_in": "dio error login screen",
+          "response_status_code": e.response!.statusCode,
+          "response_data": e.response!.data,
+          "email": email,
+        },
+      );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("خطا!"),
-        ),
+      showSnackError("خطا!");
+
+      AnalyticsService analytics = AnalyticsService();
+      await analytics.sendLog(
+        'login',
+        {
+          "catch_in": "catch in login screen",
+          "error": e,
+          "email": email,
+        },
       );
     }
     return false;
+  }
+
+  void showSnackError(String errorMsg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(errorMsg)),
+    );
   }
 
   @override
@@ -131,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   _isLoggingIn = true;
                                 });
 
-                                String _email = _emailController.text;
+                                String _email = _emailController.text.toLowerCase();
                                 String _password = _passwordController.text;
                                 bool _loginFlag = await logUserIn(
                                     influencer, _email, _password);
@@ -159,11 +179,23 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pushReplacementNamed('/email');
-                  },
-                  child: Text('ساخت حساب جدید'),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pushNamed('/forget-password');
+                      },
+                      child: Text('فراموشی رمز؟'),
+                    ),
+                    Text(' / ', style: TextStyle(fontSize: 18)),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pushReplacementNamed('/email');
+                      },
+                      child: Text('ساخت حساب جدید'),
+                    ),
+                  ],
                 ),
               ],
             ),

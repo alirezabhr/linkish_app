@@ -74,6 +74,8 @@ class Influencer with ChangeNotifier {
     prefs.setString("province", _province);
     prefs.setString("city", _city);
     prefs.setBool("is_general_page", _isGeneralPage);
+    prefs.setString("bank_card_number", "");
+    prefs.setString("bank_account_number", "");
     List<Map> topicsMap = List.generate(
         _topicsList.length, (index) => _topicsList[index].toMap());
     String topicsJson = jsonEncode(topicsMap);

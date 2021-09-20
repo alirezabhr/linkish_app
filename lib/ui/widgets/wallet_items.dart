@@ -44,7 +44,7 @@ class _WalletIncomesState extends State<WalletIncomes> {
     }
 
     setState(() {
-      _walletList.addAll(approvedList);
+      _walletList.addAll(approvedList.reversed);
       _isLoading = false;
     });
   }

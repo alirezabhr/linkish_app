@@ -20,24 +20,16 @@ class _WalletScreenState extends State<WalletScreen>
 
   withdraw(int amount) async {
     if (amount < 100000) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("حداقل مبلغ قابل برداشت: 100هزار تومان")),
-      );
+      showSnackBar("حداقل مبلغ قابل برداشت: 100هزار تومان");
     } else {
       SharedPreferences _prefs = await SharedPreferences.getInstance();
       int? userId = _prefs.getInt('id');
       try {
         await WebApi().withdraw(userId!, amount);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("درخواست شما با موفقیت ثبت شد.")),
-        );
+        showSnackBar("درخواست شما با موفقیت ثبت شد.");
         await this.getWalletAmount();
       } on DioError {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text(
-                  "در حال حاضر قادر به برداشت وجه نیستید. لطفا بعدا تلاش کنید.")),
-        );
+        showSnackBar("در حال حاضر قادر به برداشت وجه نیستید. لطفا بعدا تلاش کنید.");
       }
     }
   }
@@ -49,6 +41,12 @@ class _WalletScreenState extends State<WalletScreen>
     setState(() {
       _walletAmount = _amount;
     });
+  }
+
+  void showSnackBar(String errorMsg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(errorMsg)),
+    );
   }
 
   @override
