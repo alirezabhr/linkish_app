@@ -144,6 +144,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           influencer.registerUser();
           Navigator.pushReplacementNamed(context, "/home");
         } on DioError catch (e) {
+          setState(() {
+            _isRegistering = false;
+          });
+          print(e.response!.statusCode);
+          print(e.response!.data);
           AnalyticsService analytics = AnalyticsService();
           await analytics.sendLog(
             'register',
@@ -156,6 +161,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           );
           showSnackError("خطا در ثبت نام!");
         } catch (e) {
+          setState(() {
+            _isRegistering = false;
+          });
           AnalyticsService analytics = AnalyticsService();
           await analytics.sendLog(
             'register',
