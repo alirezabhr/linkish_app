@@ -37,7 +37,7 @@ class _EmailScreenState extends State<EmailScreen> {
       if (error.response!.statusCode == 404) {
         showSnackBar("آیدی اینستاگرام یافت نشد.");
       } else {
-        showSnackBar("خطا در بررسی صفحه اینستاگرام!\nلطفا دوباره تلاش کنید");
+        showSnackBar("خطا در بررسی صفحه اینستاگرام!\nلطفا کمی بعد تلاش کنید");
       }
       return;
     }
