@@ -5,7 +5,7 @@ import '../screens/suggested_ad_screen.dart';
 import '../screens/approved_ad_screen.dart';
 import '../screens/wallet_screen.dart';
 import '../screens/profile_screen.dart';
-import '../../services/analytics_service.dart';
+import '../../services/logger_service.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -35,8 +35,9 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             onPressed: () async {
-              AnalyticsService analytics = AnalyticsService();
-              await analytics.sendLog(
+              LoggerService logger = LoggerService();
+              await logger.setUserData();
+              await logger.sendLog(
                 'notification_btn',
                 {
                   "message": 'pressed on btn',

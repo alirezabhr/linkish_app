@@ -13,7 +13,7 @@ import '../../models/topic.dart';
 import '../../models/influencer.dart';
 import '../../services/web_api.dart';
 import '../../services/utils.dart' as utils;
-import '../../services/analytics_service.dart';
+import '../../services/logger_service.dart';
 
 enum InstagramPageType { general, pro }
 enum LocationType { all, specific }
@@ -144,8 +144,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           influencer.registerUser();
           Navigator.pushReplacementNamed(context, "/home");
         } on DioError catch (e) {
-          AnalyticsService analytics = AnalyticsService();
-          await analytics.sendLog(
+          setState(() {
+            _isRegistering = false;
+          });
+
+          LoggerService logger = LoggerService();
+          await logger.sendLog(
             'register',
             {
               "catch_in": "dio error in registration",
@@ -156,8 +160,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           );
           showSnackError("خطا در ثبت نام!");
         } catch (e) {
-          AnalyticsService analytics = AnalyticsService();
-          await analytics.sendLog(
+          setState(() {
+            _isRegistering = false;
+          });
+
+          LoggerService logger = LoggerService();
+          await logger.sendLog(
             'register',
             {
               "catch_in": "catch in registration",

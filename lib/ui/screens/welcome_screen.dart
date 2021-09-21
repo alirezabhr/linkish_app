@@ -187,7 +187,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       ),
                       Center(
                         child: Text(
-                          'نسخه 1.4.4',
+                          'نسخه 1.4.5',
                           textAlign: TextAlign.center,
                         ),
                       ),

@@ -12,7 +12,7 @@ import '../../models/influencer_ad.dart';
 import '../../models/ad.dart';
 import '../../services/web_api.dart';
 import '../../services/utils.dart' as utils;
-import '../../services/analytics_service.dart';
+import '../../services/logger_service.dart';
 
 class AdDetail extends StatefulWidget {
   final InfluencerAd influencerAd;
@@ -33,7 +33,9 @@ class _AdDetailState extends State<AdDetail> {
     if (Platform.isAndroid) {
       if (await _requestPermission(Permission.storage) &&
           // access media location needed for android 10/Q
-          await _requestPermission(Permission.accessMediaLocation)) {
+          await _requestPermission(Permission.accessMediaLocation) &&
+          // manage external storage needed for android 11/R
+          await _requestPermission(Permission.manageExternalStorage)) {
         return true;
       } else {
         return false;
@@ -238,8 +240,9 @@ class _AdDetailState extends State<AdDetail> {
                       });
                       showSnackError('خطا در دانلود محتوای تبلیغ!');
 
-                      AnalyticsService analytics = AnalyticsService();
-                      await analytics.sendLog(
+                      LoggerService logger = LoggerService();
+                      logger.setUserData();
+                      await logger.sendLog(
                         'download_ad',
                         {
                           "catch_in": 'dio error in download media on pressed',
@@ -254,8 +257,9 @@ class _AdDetailState extends State<AdDetail> {
                       });
                       showSnackError('خطا در ذخیره سازی محتوای تبلیغ!');
 
-                      AnalyticsService analytics = AnalyticsService();
-                      await analytics.sendLog(
+                      LoggerService logger = LoggerService();
+                      logger.setUserData();
+                      await logger.sendLog(
                         'download_ad',
                         {
                           "catch_in": 'catch in download media on pressed',
@@ -287,8 +291,10 @@ class _AdDetailState extends State<AdDetail> {
                     } on DioError catch (error) {
                       showSnackError(
                           'در حال حاضر امکان انتشار مستقیم به استوری وجود ندارد!');
-                      AnalyticsService analytics = AnalyticsService();
-                      await analytics.sendLog(
+
+                      LoggerService logger = LoggerService();
+                      logger.setUserData();
+                      await logger.sendLog(
                         'share_to_story',
                         {
                           "catch_in": 'dio error in share media on pressed',
@@ -298,8 +304,10 @@ class _AdDetailState extends State<AdDetail> {
                       );
                     } catch (error) {
                       showSnackError('خطا در انتشار مستقیم به استوری!');
-                      AnalyticsService analytics = AnalyticsService();
-                      await analytics.sendLog(
+
+                      LoggerService logger = LoggerService();
+                      logger.setUserData();
+                      await logger.sendLog(
                         'share_to_story',
                         {
                           "catch_in": 'catch in share media on pressed',

@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/influencer.dart';
 import '../../services/web_api.dart';
-import '../../services/analytics_service.dart';
+import '../../services/logger_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -39,8 +39,8 @@ class _LoginScreenState extends State<LoginScreen> {
         showSnackError("ایمیل یا رمز عبور اشتباه است");
       }
 
-      AnalyticsService analytics = AnalyticsService();
-      await analytics.sendLog(
+      LoggerService logger = LoggerService();
+      await logger.sendLog(
         'login',
         {
           "catch_in": "dio error login screen",
@@ -52,8 +52,8 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (e) {
       showSnackError("خطا!");
 
-      AnalyticsService analytics = AnalyticsService();
-      await analytics.sendLog(
+      LoggerService logger = LoggerService();
+      await logger.sendLog(
         'login',
         {
           "catch_in": "catch in login screen",

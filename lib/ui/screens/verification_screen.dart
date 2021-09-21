@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:linkish/services/logger_service.dart';
 
 import '../../services/web_api.dart';
+import '../../services/logger_service.dart';
 
 class VerificationScreen extends StatefulWidget {
   @override
@@ -14,9 +16,18 @@ class _VerificationScreenState extends State<VerificationScreen> {
   final TextEditingController _otpController = TextEditingController();
   bool _isLoading = false;
 
+  void showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final Map routeData = ModalRoute.of(context)!.settings.arguments as Map;
+    final Map routeData = ModalRoute
+        .of(context)!
+        .settings
+        .arguments as Map;
     final String emailAddress = routeData['email'];
 
     return Scaffold(
@@ -121,21 +132,43 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                       context, "/registration",
                                       arguments: routeData);
                                 } on DioError catch (exception) {
+                                  setState(() {
+                                    _isLoading = false;
+                                  });
+
                                   if (exception.response!.statusCode == 400) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content:
-                                            Text("رمز یکبار مصرف اشتباه است"),
-                                      ),
-                                    );
+                                    showSnackBar("رمز یکبار مصرف اشتباه است");
                                   } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content:
-                                            Text("خطا در بررسی رمز یکبار مصرف"),
-                                      ),
+                                    showSnackBar("خطا در بررسی رمز یکبار مصرف");
+
+                                    LoggerService logger = LoggerService();
+                                    await logger.sendLog(
+                                      'verification_code',
+                                      {
+                                        "catch_in": "dio error verification screen",
+                                        "email": emailAddress,
+                                        "response_status_code": exception
+                                            .response!.statusCode,
+                                        "response_data": exception.response!
+                                            .data,
+                                      },
                                     );
                                   }
+                                } catch (error) {
+                                  setState(() {
+                                    _isLoading = false;
+                                  });
+                                  showSnackBar("خطا در بررسی رمز یکبار مصرف");
+
+                                  LoggerService logger = LoggerService();
+                                  await logger.sendLog(
+                                    'login',
+                                    {
+                                      "catch_in": "catch in login screen",
+                                      "email": emailAddress,
+                                      "error": error.toString(),
+                                    },
+                                  );
                                 }
                                 setState(() {
                                   _isLoading = false;
@@ -145,12 +178,12 @@ class _VerificationScreenState extends State<VerificationScreen> {
                           },
                           child: _isLoading
                               ? CircularProgressIndicator(
-                                  color: Colors.white,
-                                )
+                            color: Colors.white,
+                          )
                               : Text(
-                                  "ادامه",
-                                  style: TextStyle(fontSize: 16),
-                                ),
+                            "ادامه",
+                            style: TextStyle(fontSize: 16),
+                          ),
                         ),
                       ),
                     ),
