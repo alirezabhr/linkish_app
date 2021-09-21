@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../services/web_api.dart';
+import '../../services/logger_service.dart';
 
 class EmailScreen extends StatefulWidget {
   @override
@@ -19,14 +20,17 @@ class _EmailScreenState extends State<EmailScreen> {
   bool _isAcceptedTermAndCondition = true;
 
   Future<void> checkIgIdAndSendEmail() async {
-    Map instagramResponse;
-    bool _isValid = true;
     setState(() {
       _isCheckingIgId = true;
     });
 
+    Map instagramResponse;
+    bool _isValid = true;
+    String userEmail = _emailController.text.toLowerCase();
+    String _instagramId = _igIdController.text;
+
     try {
-      instagramResponse = await WebApi().checkInstagramId(_igIdController.text);
+      instagramResponse = await WebApi().checkInstagramId(_instagramId);
       if (instagramResponse['followers'] < 10000) {
         showSnackBar("اینستاگرام شما کمتر از ده هزار دنبال کننده دارد.");
         _isValid = false;
@@ -39,6 +43,35 @@ class _EmailScreenState extends State<EmailScreen> {
       } else {
         showSnackBar("خطا در بررسی صفحه اینستاگرام!\nلطفا کمی بعد تلاش کنید");
       }
+
+      LoggerService logger = LoggerService();
+      await logger.sendLog(
+        'instagram_checking',
+        {
+          "catch_in": "dio error in email screen. in checkInstagram",
+          "email": userEmail,
+          "instagram_id": _instagramId,
+          "response_status_code": error.response!.statusCode,
+          "response_data": error.response!.data,
+        },
+      );
+
+      return;
+    } catch (error) {
+      _isValid = false;
+      showSnackBar("خطا در بررسی صفحه اینستاگرام!");
+
+      LoggerService logger = LoggerService();
+      await logger.sendLog(
+        'instagram_checking',
+        {
+          "catch_in": "catch in email screen. in checkInstagram",
+          "email": userEmail,
+          "instagram_id": _instagramId,
+          "error": error.toString(),
+        },
+      );
+
       return;
     }
 
@@ -47,12 +80,23 @@ class _EmailScreenState extends State<EmailScreen> {
       _isSendingEmail = true;
     });
 
-    String userEmail = _emailController.text.toLowerCase();
     try {
       await WebApi().sendEmail(userEmail);
     } catch (exception) {
       _isValid = false;
       showSnackBar("خطا در ارسال ایمیل!");
+
+      LoggerService logger = LoggerService();
+      await logger.sendLog(
+        'send_otp_in_registration',
+        {
+          "catch_in": "dio error in email screen. in sendOtpEmail",
+          "email": userEmail,
+          "instagram_id": _instagramId,
+          "error": exception.toString(),
+        },
+      );
+
       return;
     }
 
@@ -212,7 +256,8 @@ class _EmailScreenState extends State<EmailScreen> {
                               });
 
                               if (!_isAcceptedTermAndCondition) {
-                                showSnackBar("شرایط و ضوابط را تایید نکرده‌اید");
+                                showSnackBar(
+                                    "شرایط و ضوابط را تایید نکرده‌اید");
                               } else {
                                 await checkIgIdAndSendEmail();
                                 setState(() {

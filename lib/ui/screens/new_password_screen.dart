@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/influencer.dart';
 import '../../services/web_api.dart';
-import '../../services/analytics_service.dart';
+import '../../services/logger_service.dart';
 
 class NewPasswordScreen extends StatefulWidget {
   const NewPasswordScreen({Key? key}) : super(key: key);
@@ -40,8 +40,8 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
     } on DioError catch(e) {
       showSnackBar("خطا در عملیات");
 
-      AnalyticsService analytics = AnalyticsService();
-      await analytics.sendLog(
+      LoggerService logger = LoggerService();
+      await logger.sendLog(
         'forget_password',
         {
           "catch_in": "dio error in forget password",
@@ -53,8 +53,8 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
     } catch (e) {
       showSnackBar("خطا در عملیات");
 
-      AnalyticsService analytics = AnalyticsService();
-      await analytics.sendLog(
+      LoggerService logger = LoggerService();
+      await logger.sendLog(
         'forget_password',
         {
           "catch_in": "catch error in forget password",
